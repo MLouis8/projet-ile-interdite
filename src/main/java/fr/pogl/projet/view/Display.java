@@ -1,38 +1,42 @@
 package fr.pogl.projet.view;
 
-import fr.pogl.projet.controlers.PlayerCollectionBuilder;
+import fr.pogl.projet.controlers.PlayerCollection;
 import fr.pogl.projet.models.Game;
 import fr.pogl.projet.models.players.Player;
 
 import javax.swing.*;
-import java.awt.*;
 
 public class Display extends JFrame {
 
-    private final PlayerCollectionBuilder inputsManager;
+    private final PlayerCollection playersBuilder;
     private final Game game;
-    private JPanel panel;
+    private JFrame frame;
 
-    public Display(PlayerCollectionBuilder inputsManager, Game game) {
-        this.inputsManager = inputsManager;
+    public Display(PlayerCollection playersBuilder, Game game) {
+        this.playersBuilder = playersBuilder;
         this.game = game;
-        this.panel = new JPanel();
+
+        JFrame.setDefaultLookAndFeelDecorated(true);
+
+        frame = new JFrame("Île Interdite");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     public void showCreatePlayerMenu() {
-        this.panel.setLayout(new GridLayout(0, 2));
-        this.panel.add(new JButton("Button 1"));
-        this.getContentPane().add(this.panel);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setVisible(true);
+        frame.getContentPane().add(
+                new CreatePlayerGrid(playersBuilder, () -> {
+                    frame.getContentPane().removeAll();
+                    showGameMenu();
+                }));
+        frame.pack();
+        frame.setVisible(true);
     }
 
-    private void onButtonClicked() {
-        onPlayerCreatedEvent(null);
-    }
-
-    private void onPlayerCreatedEvent(Player player) {
-
+    public void showGameMenu() {
+        PlayerTurn playerTurn = new PlayerTurn(game);
+        frame.getContentPane().add(playerTurn);
+        frame.pack();
+        frame.setVisible(true);
     }
 
 }

@@ -10,4 +10,6 @@ public interface Player {
 
     void choseAction(PlayerAction action);
 
+    String getName();
+
 }
