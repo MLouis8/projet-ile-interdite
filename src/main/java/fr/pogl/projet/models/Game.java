@@ -13,12 +13,10 @@ public class Game {
     private PlayerCollection playerCollection;
     private Display display;
     private GameState state;
-    private WaterLevel[][] waterLevelGrid;
-    private int numberFloodedCell;
+    private Grid grid;
 
     public void start() {
-        this.numberFloodedCell = 0;
-        this.waterLevelGrid = new WaterLevel[9][9];
+        this.grid = new Grid();
         this.playerCollection = new PlayerCollection();
         this.display = new Display(playerCollection, this);
         display.showCreatePlayerMenu();
@@ -32,20 +30,41 @@ public class Game {
         return player;
     }
 
-    public void flood() {
-        int cell = (int)(random()*(18-this.numberFloodedCell+1)+this.numberFloodedCell);
-        int i = 0;
-        while (cell >= 0) {
-            if (this.waterLevelGrid[i / 9][i % 9] == WaterLevel.FLOOD)
-                cell++;
-            cell--;
-            i++;
+    public static int[] randomValues(int nbCells) {
+        int[] cells = new int[nbCells];
+        cells[0] = (int)(random()*18);
+
+        for (int i = 1; i < nbCells; i++) {
+            int cell = (int)(random()*18);
+            for (int j = 0; j < i; j++) {
+                while (cell == cells[j])
+                    cell = (int)(random()*18);
+            }
+            cells[i] = cell;
         }
-        switch (this.waterLevelGrid[i / 9][i % 9]) {
-            case DRY -> this.waterLevelGrid[i / 9][i % 9] = WaterLevel.MEDIUM;
-            case MEDIUM -> {
-                this.waterLevelGrid[i / 9][i % 9] = WaterLevel.FLOOD;
-                this.numberFloodedCell++;
+
+        return cells;
+    }
+
+    public void randomFlood() {
+        int[] cells = randomValues(3);
+        flood(new Coordinates(cells[0]/9, cells[0]%9));
+        flood(new Coordinates(cells[1]/9, cells[1]%9));
+        flood(new Coordinates(cells[2]/9, cells[2]%9));
+    }
+
+    public void flood(Coordinates c) {
+        switch (this.grid.waterLevels[c.getX()][c.getY()]) {
+            case DRY -> {
+                this.grid.waterLevels[c.getX()][c.getY()] = Grid.WaterLevel.FLOOD;
+                break;
+            }
+            case FLOOD -> {
+                this.grid.waterLevels[c.getX()][c.getY()] = Grid.WaterLevel.SUBMERGED;
+                break;
+            }
+            case SUBMERGED -> {
+                break;
             }
         }
     }
