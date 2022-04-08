@@ -10,11 +10,16 @@ public class Grid {
 
     public HashMap<Coordinates, Artefacts> artefactsMap;
 
+    public HashMap<Coordinates, Artefacts> keysMap;
+
     public WaterLevel[][] waterLevels;
+
+    public Coordinates heliport;
 
     public Grid() {
         this.waterLevels = new WaterLevel[9][9];
         this.artefactsMap = randomArtifacts();
+        this.keysMap = randomArtifacts();
     }
 
     private HashMap<Coordinates, Artefacts> randomArtifacts() {

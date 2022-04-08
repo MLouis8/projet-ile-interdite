@@ -26,18 +26,18 @@ public class Explorator extends Player {
     }
 
     @Override
-    public void moveTo(Coordinates choseCoord) {
-        int absDiff = this.coordinates.absDiff(choseCoord);
-        int xDiff = this.coordinates.absDiffX(choseCoord);
-        int yDiff = this.coordinates.absDiffY(choseCoord);
-        if (choseCoord.getX() < 9 && choseCoord.getY() < 9 && choseCoord.getX() > -1 && choseCoord.getY() > -1) {
+    public boolean isInRange(Coordinates coord) {
+        int absDiff = this.coordinates.absDiff(coord);
+        int xDiff = this.coordinates.absDiffX(coord);
+        int yDiff = this.coordinates.absDiffY(coord);
+        if (coord.getX() < 9 && coord.getY() < 9 && coord.getX() > -1 && coord.getY() > -1) {
             System.out.println("Deplacement impossible : hors grille");
-        } else if ( ( absDiff > 1) || ( (yDiff == xDiff) && (absDiff > 2) ) ) { // ajout deplacement en diagonale
+            return false;
+        } else if ( ( absDiff > 1) || ( (yDiff == xDiff) && (absDiff > 2) ) ) {
             System.out.println("Deplacement impossible : case injoignable");
-
-            // tester aussi si case bloquee
+            return false;
         } else {
-            this.coordinates.set(choseCoord);
+            return true;
         }
     }
 }

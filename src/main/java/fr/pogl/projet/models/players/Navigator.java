@@ -6,13 +6,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
-public class Engineer extends Player {
+public class Navigator extends Player {
 
     private String name;
     private Coordinates coordinates;
     private int actionCounter;
 
-    public Engineer(String name) {
+    public Navigator(String name) {
         this.coordinates = new Coordinates(0, 0);
         this.name = name;
         resetCounter();

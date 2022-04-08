@@ -9,13 +9,9 @@ import java.util.HashMap;
 public abstract class Player {
 
     private String name;
-    Coordinates coordinates;
-
+    private Coordinates coordinates;
     private int actionCounter;
-
-    boolean hasActionsLeft(){ return actionCounter > 0; }
-
-    Grid.Artefacts[] artefactsKeys;
+    boolean[] artefactsKeys;
 
     abstract public Collection<PlayerAction> getAvailableActions();
 
@@ -31,20 +27,44 @@ public abstract class Player {
         return name;
     }
 
+    boolean hasActionsLeft(){ return actionCounter > 0; }
+
     public void resetCounter() { this.actionCounter = 3; }
 
     public void decreaseCounter() { this.actionCounter--; }
 
+    public boolean isDrowning(Grid.WaterLevel[][] waterLevels) {
+        return waterLevels[this.coordinates.getX()/9][this.coordinates.getY()%9] == Grid.WaterLevel.SUBMERGED;
+    }
+
+    public boolean hasKey(Grid.Artefacts artefact) {
+        return this.artefactsKeys[artefact.ordinal()];
+    }
+
     public boolean isInRange(Coordinates coord) {
-        return true;
+        if (coord.getX() < 9 && coord.getY() < 9 && coord.getX() > -1 && coord.getY() > -1) {
+            System.out.println("Action impossible : hors grille");
+            return false;
+        } else if (this.coordinates.absDiff(coord) > 1) {
+            System.out.println("Assechement impossible : case injoignable");
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public void moveTo(Coordinates choseCoord, Grid.WaterLevel[][] waterLevels) {
+        if (isInRange(choseCoord)) {
+            if (waterLevels[choseCoord.getX()][choseCoord.getY()] == Grid.WaterLevel.SUBMERGED) {
+                System.out.println("Impossible de se deplacer sur une case submergee !");
+            } else {
+                this.coordinates.set(choseCoord);
+            }
+        }
     }
 
     public void dry(Coordinates choseCoord, Grid.WaterLevel[][] waterLevelGrid) {
-        if (choseCoord.getX() < 9 && choseCoord.getY() < 9 && choseCoord.getX() > -1 && choseCoord.getY() > -1) {
-            System.out.println("Assechement impossible : hors grille");
-        } else if (this.coordinates.absDiff(choseCoord) > 1) {
-            System.out.println("Assechement impossible : case injoignable");
-        } else {
+        if (isInRange(choseCoord)) {
             switch (waterLevelGrid[choseCoord.getX()][choseCoord.getY()]) {
                 case DRY -> {
                     break;
@@ -61,14 +81,6 @@ public abstract class Player {
         }
     }
 
-    public boolean hasKey(Grid.Artefacts artefact) {
-        for (Grid.Artefacts a : this.artefactsKeys) {
-            if (a == artefact)
-                return true;
-        }
-        return false;
-    }
-
     public void pick(HashMap<Coordinates, Grid.Artefacts> artefactsMap) {
         if (artefactsMap.containsKey(this.coordinates)) {
             Grid.Artefacts a = artefactsMap.get(this.coordinates);
@@ -80,15 +92,17 @@ public abstract class Player {
         }
     }
 
-    public void moveTo(Coordinates choseCoord, Grid.WaterLevel[][] waterLevels) {
-        if (choseCoord.getX() < 9 && choseCoord.getY() < 9 && choseCoord.getX() > -1 && choseCoord.getY() > -1) {
-            System.out.println("Deplacement impossible : hors grille");
-        } else if (this.coordinates.absDiff(choseCoord) > 1) {
-            System.out.println("Deplacement impossible : case injoignable");
-        } else if (waterLevels[choseCoord.getX()][choseCoord.getY()] == Grid.WaterLevel.SUBMERGED) {
-            System.out.println("Impossible de se deplacer sur une case submergee !");
+    public void searchKey(HashMap<Coordinates, Grid.Artefacts> keysMap) {
+        if (keysMap.containsKey(this.coordinates)) {
+            Grid.Artefacts a = keysMap.get(this.coordinates);
+            if (hasKey(a)) {
+                System.out.println("La cle de " + a + " est deja en votre possession !");
+            } else {
+                System.out.println("Bien joue ! Vous avez recupere la cle de l'artefact de " + a);
+                this.artefactsKeys[a.ordinal()] = true;
+            }
         } else {
-            this.coordinates.set(choseCoord);
+            System.out.println("Il n'y a pas de cles sur cette case !");
         }
     }
 }
