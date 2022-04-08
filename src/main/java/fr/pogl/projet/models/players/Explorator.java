@@ -10,7 +10,6 @@ public class Explorator extends Player {
 
     private String name;
     private Coordinates coordinates;
-    private int actionCounter;
 
     public Explorator(String name) {
         this.coordinates = new Coordinates(0, 0);

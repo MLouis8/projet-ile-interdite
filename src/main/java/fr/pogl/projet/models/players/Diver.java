@@ -1,16 +1,12 @@
 package fr.pogl.projet.models.players;
 
 import fr.pogl.projet.models.Coordinates;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
+import fr.pogl.projet.models.Grid;
 
 public class Diver extends Player {
 
     private String name;
     private Coordinates coordinates;
-    private int actionCounter;
 
     public Diver(String name) {
         this.coordinates = new Coordinates(0, 0);
@@ -18,11 +14,11 @@ public class Diver extends Player {
         resetCounter();
     }
 
-    public Collection<PlayerAction> getAvailableActions() {
-        return new ArrayList<>(Arrays.asList(PlayerAction.values()));
-    }
-
-    public void choseAction(PlayerAction action) {
+    @Override
+    public void moveTo(Coordinates choseCoord, Grid.WaterLevel[][] waterLevels) {
+        if (isInRange(choseCoord)) {
+            this.coordinates.set(choseCoord);
+        }
     }
 }
 

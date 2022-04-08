@@ -13,8 +13,6 @@ public abstract class Player {
     private int actionCounter;
     boolean[] artefactsKeys;
 
-    abstract public Collection<PlayerAction> getAvailableActions();
-
     public void choseAction(PlayerAction action, Coordinates choseCoord, Grid g) {
         switch (action) {
             case MOVE -> moveTo(choseCoord, g.waterLevels);
