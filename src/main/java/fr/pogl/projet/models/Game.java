@@ -22,6 +22,8 @@ public class Game {
         display.showCreatePlayerMenu();
     }
 
+    public Grid getGrid() { return this.grid; }
+
     int index = 0;
 
     public Player doPlayerTurn() {
@@ -67,6 +69,18 @@ public class Game {
                 break;
             }
         }
+    }
+
+    public boolean isWon() {
+        int artefactCounter = 0;
+        for (Player p : playerCollection.get()) {
+            if (p.getCoordinates().absDiff(this.grid.heliport) != 0)
+                return false;
+            artefactCounter += p.getArtefacts();
+        }
+        if (artefactCounter == 4)
+            return true;
+        return false;
     }
 
 }

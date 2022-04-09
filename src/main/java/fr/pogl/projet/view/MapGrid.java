@@ -1,10 +1,24 @@
 package fr.pogl.projet.view;
 
+import fr.pogl.projet.models.Coordinates;
+import fr.pogl.projet.models.Grid;
+
 import javax.swing.*;
 import java.awt.*;
 
 public class MapGrid extends JPanel {
-    public MapGrid(PlayerTurn playerTurn) {
+
+    Color groundColor(Grid g, int i, int j) {
+        Color c = Color.BLACK;
+        switch (g.waterLevels[i][j]) {
+            case DRY -> { c = Color.orange; break; }
+            case FLOOD -> { c = Color.CYAN; break; }
+            case SUBMERGED -> { c = Color.BLUE; break; }
+        }
+        return c;
+    }
+
+    public MapGrid(PlayerTurn playerTurn, Grid gameGrid) {
         Color BG = Color.BLACK;
         setBackground(BG);
         int SIDE = 9;
@@ -13,6 +27,7 @@ public class MapGrid extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(GAP, GAP, GAP, GAP));
         for (int i = 0; i < SIDE; i++) {
             for (int j = 0; j < SIDE; j++) {
+                BG = groundColor(gameGrid, i, j);
                 JButton button = new JButton("");
                 button.setBackground(BG);
                 int finalI = i;

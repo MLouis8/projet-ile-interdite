@@ -17,6 +17,7 @@ public class Explorator extends Player {
         resetCounter();
     }
 
+    @Override
     public Collection<PlayerAction> getAvailableActions() {
         return new ArrayList<>(Arrays.asList(PlayerAction.values()));
     }

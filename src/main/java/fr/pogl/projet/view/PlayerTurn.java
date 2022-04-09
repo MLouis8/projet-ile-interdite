@@ -20,13 +20,13 @@ public class PlayerTurn extends JPanel {
         add(actionsAmountLabel);
         add(modeLabel, SwingConstants.CENTER);
         add(buttons);
-        add(new MapGrid(this));
+        add(new MapGrid(this, game.getGrid()));
         refresh(game.doPlayerTurn());
     }
 
     private void refresh(Player player) {
         playerNameLabel.setText("player: " + player.getName());
-        actionsAmountLabel.setText("Actions: " + player.getAvailableActions().size());
+        actionsAmountLabel.setText("Actions: " + player.getActionsLeft());
         modeLabel.setText("Mode: moving");
         action = PlayerAction.MOVE;
         buttons.removeAll();
