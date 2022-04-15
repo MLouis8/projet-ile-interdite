@@ -15,10 +15,13 @@ public class Diver extends Player {
     }
 
     @Override
-    public void moveTo(Coordinates choseCoord, Grid.WaterLevel[][] waterLevels) {
+    public boolean moveTo(Coordinates choseCoord, Grid.WaterLevel[][] waterLevels) {
         if (isInRange(choseCoord)) {
             this.coordinates.set(choseCoord);
+            this.decreaseCounter();
+            return true;
         }
+        return false;
     }
 }
 

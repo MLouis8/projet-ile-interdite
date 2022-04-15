@@ -10,8 +10,6 @@ public class Grid {
 
     public HashMap<Coordinates, Artefacts> keysMap;
 
-    public HashMap<Coordinates, SpecialActions> SPMap;
-
     public WaterLevel[][] waterLevels;
 
     public Coordinates heliport;
@@ -38,16 +36,20 @@ public class Grid {
         return artefactsMap;
     }
 
-    private HashMap<Coordinates, SpecialActions> randomSpecialActions(int n) {
-        HashMap<Coordinates, SpecialActions> randomSpecialActionMap = new HashMap<>();
-        int[] cells = Game.randomValues(2*n);
-
-        for (int i = 0; i < 2*n; i += 2) {
-            randomSpecialActionMap.put(new Coordinates(cells[i]/9, cells[i]%9), SpecialActions.SAND_BAG);
-            randomSpecialActionMap.put(new Coordinates(cells[i+1]/9, cells[i+1]%9), SpecialActions.HELICOPTER);
+    public void flood(Coordinates c) {
+        switch (this.waterLevels[c.getX()][c.getY()]) {
+            case DRY -> {
+                this.waterLevels[c.getX()][c.getY()] = Grid.WaterLevel.FLOOD;
+                break;
+            }
+            case FLOOD -> {
+                this.waterLevels[c.getX()][c.getY()] = Grid.WaterLevel.SUBMERGED;
+                break;
+            }
+            case SUBMERGED -> {
+                break;
+            }
         }
-
-        return randomSpecialActionMap;
     }
 
 }

@@ -4,8 +4,6 @@ import fr.pogl.projet.controlers.PlayerCollection;
 import fr.pogl.projet.models.players.Player;
 import fr.pogl.projet.view.Display;
 
-import java.util.Arrays;
-
 import static java.lang.Math.random;
 
 public class Game {
@@ -50,25 +48,9 @@ public class Game {
 
     public void randomFlood() {
         int[] cells = randomValues(3);
-        flood(new Coordinates(cells[0]/9, cells[0]%9));
-        flood(new Coordinates(cells[1]/9, cells[1]%9));
-        flood(new Coordinates(cells[2]/9, cells[2]%9));
-    }
-
-    public void flood(Coordinates c) {
-        switch (this.grid.waterLevels[c.getX()][c.getY()]) {
-            case DRY -> {
-                this.grid.waterLevels[c.getX()][c.getY()] = Grid.WaterLevel.FLOOD;
-                break;
-            }
-            case FLOOD -> {
-                this.grid.waterLevels[c.getX()][c.getY()] = Grid.WaterLevel.SUBMERGED;
-                break;
-            }
-            case SUBMERGED -> {
-                break;
-            }
-        }
+        this.grid.flood(new Coordinates(cells[0]/9, cells[0]%9));
+        this.grid.flood(new Coordinates(cells[1]/9, cells[1]%9));
+        this.grid.flood(new Coordinates(cells[2]/9, cells[2]%9));
     }
 
     public boolean isWon() {
