@@ -1,6 +1,6 @@
 package fr.pogl.projet;
 
-import fr.pogl.projet.models.Game;
+import fr.pogl.projet.controlers.Game;
 
 public class Core {
 

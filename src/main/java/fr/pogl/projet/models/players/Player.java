@@ -1,8 +1,8 @@
 package fr.pogl.projet.models.players;
 
-import fr.pogl.projet.models.Artefacts;
-import fr.pogl.projet.models.Coordinates;
-import fr.pogl.projet.models.Grid;
+import fr.pogl.projet.models.gridManager.Artefacts;
+import fr.pogl.projet.models.gridManager.Coordinates;
+import fr.pogl.projet.models.gridManager.Grid;
 import fr.pogl.projet.models.SpecialActions;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,6 +20,12 @@ public abstract class Player {
     private int artefacts;
     private HashMap<SpecialActions, Integer> inventory;
 
+    public Player(String name) {
+        this.name = name;
+        this.coordinates = new Coordinates(0, 0);
+        resetCounter();
+    }
+
     public void choseAction(@NotNull PlayerAction action, Coordinates choseCoord, Grid g) {
         switch (action) {
             case MOVE -> moveTo(choseCoord, g.waterLevels);
@@ -31,6 +37,8 @@ public abstract class Player {
     public Collection<PlayerAction> getAvailableActions() {
         return new ArrayList<>(Arrays.asList(PlayerAction.values()));
     }
+
+    public abstract PlayerType getType();
 
     public String getName() {
         return name;
@@ -65,10 +73,7 @@ public abstract class Player {
     public boolean hasHelicopter() { return this.inventory.get(SpecialActions.HELICOPTER) > 0; }
 
     public boolean isInRange(@NotNull Coordinates coord) {
-        if (coord.getX() < 9 && coord.getY() < 9 && coord.getX() > -1 && coord.getY() > -1) {
-            System.out.println("Action impossible : hors grille");
-            return false;
-        } else if (this.coordinates.absDiff(coord) > 1) {
+        if (this.coordinates.absDiff(coord) > 1) {
             System.out.println("Assechement impossible : case injoignable");
             return false;
         } else {

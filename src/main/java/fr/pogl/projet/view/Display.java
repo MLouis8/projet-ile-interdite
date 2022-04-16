@@ -1,8 +1,7 @@
 package fr.pogl.projet.view;
 
 import fr.pogl.projet.controlers.PlayerCollection;
-import fr.pogl.projet.models.Game;
-import fr.pogl.projet.models.players.Player;
+import fr.pogl.projet.controlers.Game;
 
 import javax.swing.*;
 

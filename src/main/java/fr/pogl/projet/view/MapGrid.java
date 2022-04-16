@@ -1,7 +1,7 @@
 package fr.pogl.projet.view;
 
-import fr.pogl.projet.models.Coordinates;
-import fr.pogl.projet.models.Grid;
+import fr.pogl.projet.models.gridManager.Coordinates;
+import fr.pogl.projet.models.gridManager.Grid;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,10 +30,10 @@ public class MapGrid extends JPanel {
                 BG = groundColor(gameGrid, i, j);
                 JButton button = new JButton("");
                 button.setBackground(BG);
-                int finalI = i;
-                int finalJ = j;
+                Coordinates coord = new Coordinates(i, j);
                 button.addActionListener((e) -> {
-                    System.out.println("Clicked on " + finalI + " " + finalJ + " with action " + playerTurn.getAction());
+                    System.out.println("Clicked on " + coord.getX() + " " + coord.getY() + " with action " + playerTurn.getAction());
+                    playerTurn.activate(coord);
                 });
                 Dimension BTN_PREF_SIZE = new Dimension(80, 80);
                 button.setPreferredSize(BTN_PREF_SIZE);

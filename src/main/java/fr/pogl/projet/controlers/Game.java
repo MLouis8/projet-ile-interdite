@@ -1,6 +1,7 @@
-package fr.pogl.projet.models;
+package fr.pogl.projet.controlers;
 
-import fr.pogl.projet.controlers.PlayerCollection;
+import fr.pogl.projet.models.gridManager.Coordinates;
+import fr.pogl.projet.models.gridManager.Grid;
 import fr.pogl.projet.models.players.Player;
 import fr.pogl.projet.view.Display;
 

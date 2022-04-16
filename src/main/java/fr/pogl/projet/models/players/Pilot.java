@@ -1,7 +1,7 @@
 package fr.pogl.projet.models.players;
 
-import fr.pogl.projet.models.Coordinates;
-import fr.pogl.projet.models.Grid;
+import fr.pogl.projet.models.gridManager.Coordinates;
+import fr.pogl.projet.models.gridManager.Grid;
 
 public class Pilot extends Player {
 
@@ -9,9 +9,7 @@ public class Pilot extends Player {
     private Coordinates coordinates;
 
     public Pilot(String name) {
-        this.coordinates = new Coordinates(0, 0);
-        this.name = name;
-        resetCounter();
+        super(name);
     }
 
     @Override

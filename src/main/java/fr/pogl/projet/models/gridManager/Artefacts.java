@@ -1,4 +1,4 @@
-package fr.pogl.projet.models;
+package fr.pogl.projet.models.gridManager;
 
 public enum Artefacts {
     FIRE,

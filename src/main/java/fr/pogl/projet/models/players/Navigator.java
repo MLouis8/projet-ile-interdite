@@ -1,6 +1,6 @@
 package fr.pogl.projet.models.players;
 
-import fr.pogl.projet.models.Coordinates;
+import fr.pogl.projet.models.gridManager.Coordinates;
 
 public class Navigator extends Player {
 
@@ -8,8 +8,6 @@ public class Navigator extends Player {
     private Coordinates coordinates;
 
     public Navigator(String name) {
-        this.coordinates = new Coordinates(0, 0);
-        this.name = name;
-        resetCounter();
+        super(name);
     }
 }

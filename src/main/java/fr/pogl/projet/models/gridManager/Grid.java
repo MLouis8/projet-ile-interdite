@@ -1,4 +1,6 @@
-package fr.pogl.projet.models;
+package fr.pogl.projet.models.gridManager;
+
+import fr.pogl.projet.controlers.Game;
 
 import java.util.HashMap;
 
@@ -17,7 +19,7 @@ public class Grid {
     public Grid() {
         this.heliport = new Coordinates(8, 8);
         this.waterLevels = new WaterLevel[9][9];
-        for (int i = 0; i < 18; i++) {
+        for (int i = 0; i < 81; i++) {
             this.waterLevels[i/9][i%9] = WaterLevel.DRY;
         }
         this.artefactsMap = randomArtifacts();
