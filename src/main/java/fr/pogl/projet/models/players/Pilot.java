@@ -27,4 +27,6 @@ public class Pilot extends Player {
         }
         return false;
     }
+
+    public PlayerType getType() { return  PlayerType.PILOT; }
 }

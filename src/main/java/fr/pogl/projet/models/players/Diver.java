@@ -21,5 +21,7 @@ public class Diver extends Player {
         }
         return false;
     }
+
+    public PlayerType getType() { return  PlayerType.DIVER; }
 }
 

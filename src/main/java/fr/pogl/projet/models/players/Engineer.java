@@ -10,4 +10,6 @@ public class Engineer extends Player {
     public Engineer(String name) {
         super(name);
     }
+
+    public PlayerType getType() { return  PlayerType.ENGINEER; }
 }

@@ -11,5 +11,6 @@ public class Messenger extends Player {
         super(name);
     }
 
+    public PlayerType getType() { return  PlayerType.MESSENGER; }
 }
 

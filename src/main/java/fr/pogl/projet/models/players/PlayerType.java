@@ -5,7 +5,7 @@ public enum PlayerType {
     EXPLORATOR,
     ENGINEER,
     PILOT,
-    POSTMAN,
+    MESSENGER,
     NAVIGATOR,
     DIVER
 
