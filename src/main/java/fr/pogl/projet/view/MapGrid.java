@@ -8,6 +8,8 @@ import java.awt.*;
 
 public class MapGrid extends JPanel {
 
+    private JFrame playerView;
+
     Color groundColor(Grid g, int i, int j) {
         Color c = Color.BLACK;
         switch (g.waterLevels[i][j]) {

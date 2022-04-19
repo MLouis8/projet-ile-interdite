@@ -14,6 +14,7 @@ public class PlayerTurn extends JPanel {
     private PlayerAction action;
     private Player player;
     private Grid grid;
+    private boolean searchKey;
 
     private final JLabel playerNameLabel = new JLabel();
     private final JLabel actionsAmountLabel = new JLabel();
@@ -24,6 +25,7 @@ public class PlayerTurn extends JPanel {
     public PlayerTurn(@NotNull Game game) {
         player = game.doPlayerTurn();
         grid = game.getGrid();
+        searchKey = false;
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         add(playerNameLabel);
@@ -51,8 +53,8 @@ public class PlayerTurn extends JPanel {
                 }
             }
             refresh();
-        } else {
-            System.out.println("Le joueur n'a plus d'actions");
+        } else if (player.getActionsLeft() == 0){
+            searchKey = true;
         }
     }
 
@@ -74,4 +76,6 @@ public class PlayerTurn extends JPanel {
     }
 
     public PlayerAction getAction() { return action; }
+
+    public Player getPlayer() { return player; }
 }

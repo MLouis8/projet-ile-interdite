@@ -5,6 +5,8 @@ import fr.pogl.projet.models.gridManager.Grid;
 import fr.pogl.projet.models.players.Player;
 import fr.pogl.projet.view.Display;
 
+import java.awt.*;
+
 import static java.lang.Math.random;
 
 public class Game {
@@ -65,5 +67,4 @@ public class Game {
             return true;
         return false;
     }
-
 }
