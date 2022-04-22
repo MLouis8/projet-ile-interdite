@@ -32,6 +32,7 @@ public class Display extends JFrame {
     }
 
     public void showGameMenu() {
+        game.initializeGrid();
         PlayerTurn playerTurn = new PlayerTurn(game);
         frame.getContentPane().add(playerTurn);
         frame.pack();

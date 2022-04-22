@@ -1,9 +1,10 @@
 package fr.pogl.projet.models.players;
 
+import fr.pogl.projet.models.gridManager.CellState;
 import fr.pogl.projet.models.gridManager.Artefacts;
 import fr.pogl.projet.models.gridManager.Coordinates;
-import fr.pogl.projet.models.gridManager.Grid;
 import fr.pogl.projet.models.SpecialActions;
+import fr.pogl.projet.models.gridManager.WaterLevel;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -24,14 +25,6 @@ public abstract class Player {
         this.name = name;
         this.coordinates = new Coordinates(0, 0);
         resetCounter();
-    }
-
-    public void choseAction(@NotNull PlayerAction action, Coordinates choseCoord, Grid g) {
-        switch (action) {
-            case MOVE -> moveTo(choseCoord, g.waterLevels);
-            case DRY_OUT -> dry(choseCoord, g.waterLevels);
-            case PICK_ARTEFACT -> pick(g.artefactsMap);
-        }
     }
 
     public Collection<PlayerAction> getAvailableActions() {
@@ -56,10 +49,6 @@ public abstract class Player {
 
     public void increaseCounter() { this.actionCounter++; }
 
-    public boolean isDrowning(Grid.WaterLevel[][] waterLevels) {
-        return waterLevels[this.coordinates.getX()/9][this.coordinates.getY()%9] == Grid.WaterLevel.SUBMERGED;
-    }
-
     public boolean hasKey(Artefacts artefact) {
         return this.artefactsKeys[artefact.ordinal()];
     }
@@ -81,12 +70,18 @@ public abstract class Player {
         }
     }
 
-    public boolean moveTo(Coordinates choseCoord, Grid.WaterLevel[][] waterLevels) {
+    public void move(Coordinates choseCoord, CellState[][] grid) {
+        grid[coordinates.getX()][coordinates.getY()].removePlayer(this);
+        this.coordinates.set(choseCoord);
+        grid[coordinates.getX()][coordinates.getY()].addPlayer(this);
+    }
+
+    public boolean moveTo(Coordinates choseCoord, CellState[][] grid) {
         if (isInRange(choseCoord)) {
-            if (waterLevels[choseCoord.getX()][choseCoord.getY()] == Grid.WaterLevel.SUBMERGED) {
+            if (grid[choseCoord.getX()][choseCoord.getY()].getWaterLevel() == WaterLevel.SUBMERGED) {
                 System.out.println("Impossible de se deplacer sur une case submergee !");
             } else {
-                this.coordinates.set(choseCoord);
+                move(choseCoord, grid);
                 this.decreaseCounter();
                 return true;
             }
@@ -94,25 +89,23 @@ public abstract class Player {
         return false;
     }
 
-    public boolean helicopter(Coordinates choseCoord, Grid.WaterLevel[][] waterLevels) {
-        boolean dry = waterLevels[choseCoord.getX()][choseCoord.getY()] != Grid.WaterLevel.SUBMERGED;
-        boolean inGrid = choseCoord.getX() < 9 && choseCoord.getY() < 9 && choseCoord.getX() > -1 && choseCoord.getY() > -1;
-        if (dry && inGrid) {
-            this.coordinates.set(choseCoord);
+    public boolean helicopter(Coordinates choseCoord, CellState[][] grid) {
+        if (grid[choseCoord.getX()][choseCoord.getY()].getWaterLevel() != WaterLevel.SUBMERGED) {
+            move(choseCoord, grid);
             return true;
         }
         return false;
     }
 
-    public boolean dry(Coordinates choseCoord, Grid.WaterLevel[][] waterLevelGrid) {
+    public boolean dry(Coordinates choseCoord, CellState[][] grid) {
         if (isInRange(choseCoord)) {
-            switch (waterLevelGrid[choseCoord.getX()][choseCoord.getY()]) {
+            switch (grid[choseCoord.getX()][choseCoord.getY()].getWaterLevel()) {
                 case DRY -> {
-                    this.decreaseCounter();
-                    return true;
+                    System.out.println("Case deja seche !");
+                    return false;
                 }
                 case FLOOD -> {
-                    waterLevelGrid[choseCoord.getX()][choseCoord.getY()] = Grid.WaterLevel.DRY;
+                    grid[choseCoord.getX()][choseCoord.getY()].setWaterLevel(WaterLevel.DRY);
                     this.decreaseCounter();
                     return true;
                 }
@@ -125,30 +118,34 @@ public abstract class Player {
         return false;
     }
 
-    public boolean sandBag(Coordinates choseCoord, Grid.WaterLevel[][] waterLevelGrid) {
-        if (dry(choseCoord, waterLevelGrid)) {
+    public boolean sandBag(Coordinates choseCoord, CellState[][] grid) {
+        if (dry(choseCoord, grid)) {
             this.increaseCounter();
             return true;
         }
         return false;
     }
 
-    public boolean pick(@NotNull HashMap<Coordinates, Artefacts> artefactsMap) {
-        if (artefactsMap.containsKey(this.coordinates)) {
-            Artefacts a = artefactsMap.get(this.coordinates);
+    public boolean pick(CellState[][] grid) {
+        CellState cell = grid[coordinates.getX()][coordinates.getY()];
+        if (cell.hasArtefact()) {
+            Artefacts a = cell.getArtefact();
             if (this.hasKey(a)) {
                 System.out.println("Bien joue a l'aide de votre cle, vous avez recupere l'artefact de " + a);
-                artefactsMap.remove(a);
+                cell.removeArtefacts();
                 this.artefacts++;
                 this.decreaseCounter();
                 return true;
             } else {
                 System.out.println("Vous ne pouvez pas recuperer l'artefact de " + a + " vous n'avez pas la bonne cle.");
             }
+        } else {
+            System.out.println("Dommage la cle n'est pas la");
         }
         return false;
     }
 
+    /**
     public void searchKey(@NotNull HashMap<Coordinates, Artefacts> keysMap, Grid g) {
         if (keysMap.containsKey(this.coordinates)) {
             Artefacts a = keysMap.get(this.coordinates);
@@ -172,7 +169,7 @@ public abstract class Player {
                 System.out.println("Tu as tout de meme trouve un helicoptere !");
             }
         }
-    }
+    }**/
 
     public void exchangeKey(@NotNull Player other, Artefacts a) {
         if (this.coordinates.absDiff(other.getCoordinates()) != 0) {

@@ -1,7 +1,7 @@
 package fr.pogl.projet.models.players;
 
+import fr.pogl.projet.models.gridManager.CellState;
 import fr.pogl.projet.models.gridManager.Coordinates;
-import fr.pogl.projet.models.gridManager.Grid;
 
 public class Diver extends Player {
 
@@ -13,9 +13,9 @@ public class Diver extends Player {
     }
 
     @Override
-    public boolean moveTo(Coordinates choseCoord, Grid.WaterLevel[][] waterLevels) {
+    public boolean moveTo(Coordinates choseCoord, CellState[][] grid) {
         if (isInRange(choseCoord)) {
-            this.coordinates.set(choseCoord);
+            move(choseCoord, grid);
             this.decreaseCounter();
             return true;
         }

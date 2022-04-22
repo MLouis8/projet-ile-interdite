@@ -4,5 +4,6 @@ public enum Artefacts {
     FIRE,
     WATER,
     WIND,
-    EARTH
+    EARTH,
+    NULL
 }

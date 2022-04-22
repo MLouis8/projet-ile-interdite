@@ -1,8 +1,6 @@
 package fr.pogl.projet.view;
 
 import fr.pogl.projet.controlers.Game;
-import fr.pogl.projet.models.gridManager.Coordinates;
-import fr.pogl.projet.models.gridManager.Grid;
 import fr.pogl.projet.models.players.Player;
 import fr.pogl.projet.models.players.PlayerAction;
 import org.jetbrains.annotations.NotNull;
@@ -13,55 +11,40 @@ public class PlayerTurn extends JPanel {
 
     private PlayerAction action;
     private Player player;
-    private Grid grid;
     private boolean searchKey;
+    private Game game;
 
     private final JLabel playerNameLabel = new JLabel();
     private final JLabel actionsAmountLabel = new JLabel();
     private final JLabel modeLabel = new JLabel();
+    private final JLabel numberOfPlayers = new JLabel();
 
     JPanel buttons = new JPanel();
 
     public PlayerTurn(@NotNull Game game) {
-        player = game.doPlayerTurn();
-        grid = game.getGrid();
-        searchKey = false;
+        this.game = game;
+        player = this.game.doPlayerTurn();
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         add(playerNameLabel);
         add(actionsAmountLabel);
         add(modeLabel, SwingConstants.CENTER);
+        add(numberOfPlayers);
         add(buttons);
-        add(new MapGrid(this, grid));
+        add(new MapGrid(this, this.game));
         refresh();
     }
 
-    public void activate(Coordinates c) {
-        if (player.getActionsLeft() > 0) {
-            switch (getAction()) {
-                case MOVE: {
-                    player.moveTo(c, grid.waterLevels);
-                    break;
-                }
-                case DRY_OUT: {
-                    player.dry(c, grid.waterLevels);
-                    break;
-                }
-                case PICK_ARTEFACT: {
-                    player.pick(grid.artefactsMap);
-                    break;
-                }
-            }
-            refresh();
-        } else if (player.getActionsLeft() == 0){
-            searchKey = true;
-        }
-    }
+    public PlayerAction getAction() { return action; }
 
-    private void refresh() {
+    public Player getPlayer() { return player; }
+
+    public void refresh() {
         playerNameLabel.setText("player: " + player.getName());
         actionsAmountLabel.setText("Actions: " + player.getActionsLeft());
         modeLabel.setText("Mode: moving");
+        numberOfPlayers.setText("Number of players: " + game.getNumberPlayers());
+
         if (action == null)
             action = PlayerAction.MOVE;
         buttons.removeAll();
@@ -73,9 +56,18 @@ public class PlayerTurn extends JPanel {
             });
             buttons.add(modeButton);
         }
+        JButton endTurn = new JButton("End Turn");
+        endTurn.addActionListener(e -> {
+            nextTurn();
+        });
+        buttons.add(endTurn);
+        if (player.getActionsLeft() == 0)
+            nextTurn();
     }
 
-    public PlayerAction getAction() { return action; }
-
-    public Player getPlayer() { return player; }
+    private void nextTurn() {
+        player = game.doPlayerTurn();
+        game.randomFlood();
+        refresh();
+    }
 }
