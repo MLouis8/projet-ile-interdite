@@ -9,7 +9,7 @@ public class Display extends JFrame {
 
     private final PlayerCollection playersBuilder;
     private final Game game;
-    private JFrame frame;
+    private final JFrame frame;
 
     public Display(PlayerCollection playersBuilder, Game game) {
         this.playersBuilder = playersBuilder;

@@ -24,13 +24,23 @@ public class MapGrid extends JPanel {
                     System.out.println("Clicked on " + coord.getX() + " " + coord.getY() + " with action " + playerTurn.getAction());
                     game.activate(coord, playerTurn.getAction(), playerTurn.getPlayer());
                     playerTurn.refresh();
-                    button.setIcon(new ImageIcon(cell.getIcon()));
+                    updateButtons(this, game.getGrid());
                 });
 
                 Dimension BTN_PREF_SIZE = new Dimension(80, 80);
                 button.setPreferredSize(BTN_PREF_SIZE);
-
                 add(button);
+            }
+        }
+    }
+
+    private void updateButtons(MapGrid mapGrid, CellState[][] cells) {
+        Component[] components = mapGrid.getComponents();
+
+        for (int i = 0; i < components.length; i++) {
+            if (components[i] instanceof JButton button) {
+                CellState cell = cells[i /9][i%9];
+                button.setIcon(new ImageIcon(cell.getIcon()));
             }
         }
     }

@@ -13,13 +13,12 @@ public class Game {
 
     private PlayerCollection playerCollection;
     private Coordinates heliport;
-    private Display display;
     private CellState[][] grid;
 
     public void start() {
         this.playerCollection = new PlayerCollection();
-        this.heliport = new Coordinates(8, 8);
-        this.display = new Display(playerCollection, this);
+        this.heliport = new Coordinates(8, 4);
+        Display display = new Display(playerCollection, this);
         display.showCreatePlayerMenu();
     }
 
@@ -30,7 +29,6 @@ public class Game {
     int index = 0;
 
     public void initializeGrid() {
-        System.out.println("Initialisation de la grille");
         CellState[][] newGrid = new CellState[9][9];
         Coordinates[] a = randomCoords(8);
 
@@ -41,7 +39,7 @@ public class Game {
         }
 
         for (int i = 0; i < this.playerCollection.get().size(); i++)
-            newGrid[0][0].addPlayer(this.playerCollection.get().get(i));
+            newGrid[0][4].addPlayer(this.playerCollection.get().get(i));
 
         newGrid[a[0].getX()][a[0].getY()].setArtefacts(Artefacts.EARTH, Artefacts.NULL);
         newGrid[a[0].getX()][a[0].getY()].setArtefacts(Artefacts.NULL, Artefacts.EARTH);
@@ -51,6 +49,8 @@ public class Game {
         newGrid[a[2].getX()][a[2].getY()].setArtefacts(Artefacts.NULL, Artefacts.WIND);
         newGrid[a[3].getX()][a[3].getY()].setArtefacts(Artefacts.WATER, Artefacts.NULL);
         newGrid[a[3].getX()][a[3].getY()].setArtefacts(Artefacts.NULL, Artefacts.WATER);
+
+        newGrid[heliport.getX()][heliport.getY()].setHeliport();
 
         this.grid = newGrid;
     }
@@ -62,14 +62,14 @@ public class Game {
         return player;
     }
 
-    public static Coordinates[] randomCoords(int nbCoords) {
+    public Coordinates[] randomCoords(int nbCoords) {
         Coordinates[] coords = new Coordinates[nbCoords];
         coords[0] = new Coordinates((int)(random()*9), (int)(random()*9));
 
-        for (int i = 1; i < nbCoords; i++) {
+        for (int i = 0; i < nbCoords; i++) {
             Coordinates cell = new Coordinates((int)(random()*9), (int)(random()*9));
             for (int j = 0; j < i; j++) {
-                while (coords[j].absDiff(cell) == 0)
+                while ((coords[j].absDiff(cell) == 0) || (coords[j].absDiff(this.heliport) == 0))
                     cell.set(new Coordinates((int)(random()*9), (int)(random()*9)));
             }
             coords[i] = cell;
@@ -92,26 +92,16 @@ public class Game {
                 return false;
             artefactCounter += p.getArtefacts();
         }
-        if (artefactCounter == 4)
-            return true;
-        return false;
+        return artefactCounter == 4;
     }
 
     public void activate(Coordinates c, PlayerAction a, Player p) {
         if (p.getActionsLeft() > 0) {
             switch (a) {
-                case MOVE: {
-                    p.moveTo(c, grid);
-                    break;
-                }
-                case DRY_OUT: {
-                    p.dry(c, grid);
-                    break;
-                }
-                case PICK_ARTEFACT: {
-                    p.pick(grid);
-                    break;
-                }
+                case MOVE -> p.moveTo(c, grid);
+                case DRY_OUT -> p.dry(c, grid);
+                case PICK_ARTEFACT -> p.pick(grid);
+                default -> throw new IllegalStateException("Unexpected value: " + a);
             }
         }
     }

@@ -8,16 +8,16 @@ import java.util.List;
 
 public class PlayerCollection {
 
-    private List<Player> players = new ArrayList<>();
+    private final List<Player> players = new ArrayList<>();
 
     public void addPlayer(String name, PlayerType playerType) {
         Player player = new Explorator(name);
         switch (playerType) {
-            case DIVER -> { player = new Diver(name); }
-            case PILOT -> { player = new Pilot(name); }
-            case ENGINEER -> { player = new Engineer(name); }
-            case MESSENGER -> { player = new Messenger(name); }
-            case NAVIGATOR -> { player = new Navigator(name); }
+            case DIVER -> player = new Diver(name);
+            case PILOT -> player = new Pilot(name);
+            case ENGINEER -> player = new Engineer(name);
+            case MESSENGER -> player = new Messenger(name);
+            case NAVIGATOR -> player = new Navigator(name);
         }
         players.add(player);
     }
@@ -28,12 +28,12 @@ public class PlayerCollection {
 
     @Override
     public String toString() {
-        String s = "";
+        StringBuilder s = new StringBuilder();
         for (Player p : players) {
-            s += p.getName();
-            s += " ";
+            s.append(p.getName());
+            s.append(" ");
         }
-        return s;
+        return s.toString();
     }
 
 }

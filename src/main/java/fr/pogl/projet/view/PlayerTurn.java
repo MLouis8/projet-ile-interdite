@@ -11,8 +11,7 @@ public class PlayerTurn extends JPanel {
 
     private PlayerAction action;
     private Player player;
-    private boolean searchKey;
-    private Game game;
+    private final Game game;
 
     private final JLabel playerNameLabel = new JLabel();
     private final JLabel actionsAmountLabel = new JLabel();
@@ -57,9 +56,7 @@ public class PlayerTurn extends JPanel {
             buttons.add(modeButton);
         }
         JButton endTurn = new JButton("End Turn");
-        endTurn.addActionListener(e -> {
-            nextTurn();
-        });
+        endTurn.addActionListener(e -> nextTurn());
         buttons.add(endTurn);
         if (player.getActionsLeft() == 0)
             nextTurn();

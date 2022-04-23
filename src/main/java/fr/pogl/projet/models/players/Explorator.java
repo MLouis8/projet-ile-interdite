@@ -1,6 +1,7 @@
 package fr.pogl.projet.models.players;
 
 import fr.pogl.projet.models.gridManager.Coordinates;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,7 +19,7 @@ public class Explorator extends Player {
     }
 
     @Override
-    public boolean isInRange(Coordinates coord) {
+    public boolean isInRange(@NotNull Coordinates coord) {
         int absDiff = this.getCoordinates().absDiff(coord);
         int xDiff = this.getCoordinates().absDiffX(coord);
         int yDiff = this.getCoordinates().absDiffY(coord);

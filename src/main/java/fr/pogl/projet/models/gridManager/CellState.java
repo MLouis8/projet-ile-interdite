@@ -1,7 +1,5 @@
 package fr.pogl.projet.models.gridManager;
 
-import fr.pogl.projet.models.gridManager.Artefacts;
-import fr.pogl.projet.models.gridManager.WaterLevel;
 import fr.pogl.projet.models.players.Player;
 import fr.pogl.projet.models.players.PlayerType;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +19,7 @@ public class CellState {
     private int numberPlayers;
     private Artefacts artefact;
     private Artefacts key;
+    private boolean heliport;
 
     public CellState(int n) {
         waterLevel = WaterLevel.DRY;
@@ -29,6 +28,10 @@ public class CellState {
         artefact = Artefacts.NULL;
         key = Artefacts.NULL;
     }
+
+    public boolean isHeliport() { return waterLevel == WaterLevel.NULL; }
+
+    public void setHeliport() { waterLevel = WaterLevel.NULL; }
 
     public boolean hasKey() { return key != Artefacts.NULL; }
 
@@ -63,6 +66,7 @@ public class CellState {
         for (int i = 0; i < numberPlayers; i++) {
             if (p.getClass() == players[i].getClass()) {
                 players[i] = null;
+                numberPlayers--;
                 return;
             }
         }
@@ -113,21 +117,23 @@ public class CellState {
 
     private ArrayList<BufferedImage> createIconArray() {
         ArrayList<BufferedImage> images = new ArrayList<BufferedImage>();
-
-        for (int i = 0; i < numberPlayers; i++) {
+        int i = 0;
+        while(i < numberPlayers) {
             try {
                 images.add(playerIcon(this.players[i].getType()));
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            i++;
         }
 
         return images;
     }
 
     private BufferedImage getBgImage() throws IOException {
-        BufferedImage img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/sand&water.jpg"));
+        BufferedImage img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/heliport.jpg))"));
         switch(this.waterLevel) {
+            case FLOOD -> { img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/sand&water.jpg")); break; }
             case DRY -> { img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/sand.jpg")); break; }
             case SUBMERGED -> { img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/water.jpg")); break; }
         }

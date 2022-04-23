@@ -14,7 +14,7 @@ import java.util.HashMap;
 
 public abstract class Player {
 
-    private String name;
+    private final String name;
     private Coordinates coordinates;
     private int actionCounter;
     private boolean[] artefactsKeys;
@@ -101,7 +101,7 @@ public abstract class Player {
         if (isInRange(choseCoord)) {
             switch (grid[choseCoord.getX()][choseCoord.getY()].getWaterLevel()) {
                 case DRY -> {
-                    System.out.println("Case deja seche !");
+                    System.out.println("Case deja sèche !");
                     return false;
                 }
                 case FLOOD -> {
@@ -109,10 +109,7 @@ public abstract class Player {
                     this.decreaseCounter();
                     return true;
                 }
-                case SUBMERGED -> {
-                    System.out.println("Impossible d'assecher une case submergee !");
-                    break;
-                }
+                case SUBMERGED -> System.out.println("Impossible d'assécher une case submerge !");
             }
         }
         return false;
@@ -137,7 +134,7 @@ public abstract class Player {
                 this.decreaseCounter();
                 return true;
             } else {
-                System.out.println("Vous ne pouvez pas recuperer l'artefact de " + a + " vous n'avez pas la bonne cle.");
+                System.out.println("Vous ne pouvez pas recupere l'artefact de " + a + " vous n'avez pas la bonne cle.");
             }
         } else {
             System.out.println("Dommage la cle n'est pas la");
