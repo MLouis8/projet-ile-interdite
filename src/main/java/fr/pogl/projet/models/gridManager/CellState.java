@@ -44,6 +44,7 @@ public class CellState {
     public void setArtefacts(Artefacts a, Artefacts k) {
         artefact = a;
         key = k;
+        System.out.println(hasArtefact());
     }
 
     public void removeArtefacts() {
@@ -74,49 +75,30 @@ public class CellState {
 
     public void flood() {
         switch (this.waterLevel) {
-            case DRY -> {
-                this.waterLevel = WaterLevel.FLOOD;
-                break;
-            }
-            case FLOOD -> {
-                this.waterLevel = WaterLevel.SUBMERGED;
-                break;
-            }
-            case SUBMERGED -> {
-                break;
-            }
+            case DRY -> this.waterLevel = WaterLevel.FLOOD;
+            case FLOOD -> this.waterLevel = WaterLevel.SUBMERGED;
         }
     }
 
     private BufferedImage playerIcon(@NotNull PlayerType t) throws IOException {
         BufferedImage img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/explorator.png"));
         switch (t) {
-            case DIVER -> {
+            case DIVER ->
                 img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/diver.png"));
-                break;
-            }
-            case ENGINEER -> {
+            case ENGINEER ->
                 img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/engineer.png"));
-                break;
-            }
-            case NAVIGATOR -> {
+            case NAVIGATOR ->
                 img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/navigator.png"));
-                break;
-            }
-            case MESSENGER -> {
+            case MESSENGER ->
                 img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/postman.png"));
-                break;
-            }
-            case PILOT -> {
+            case PILOT ->
                 img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/pilot.png"));
-                break;
-            }
         }
         return img;
     }
 
     private ArrayList<BufferedImage> createIconArray() {
-        ArrayList<BufferedImage> images = new ArrayList<BufferedImage>();
+        ArrayList<BufferedImage> images = new ArrayList<>();
         int i = 0;
         while(i < numberPlayers) {
             try {
@@ -131,11 +113,20 @@ public class CellState {
     }
 
     private BufferedImage getBgImage() throws IOException {
-        BufferedImage img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/heliport.jpg))"));
-        switch(this.waterLevel) {
-            case FLOOD -> { img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/sand&water.jpg")); break; }
-            case DRY -> { img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/sand.jpg")); break; }
-            case SUBMERGED -> { img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/water.jpg")); break; }
+        BufferedImage img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/heliport.jpg"));
+        if (this.hasArtefact()) {
+            switch (getArtefact()) {
+                case FIRE -> img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/fire.jpg"));
+                case WATER -> img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/waterArtefact.jpg"));
+                case WIND -> img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/wind.jpg"));
+                case EARTH -> img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/earth.jpg"));
+            }
+        } else {
+            switch (this.waterLevel) {
+                case FLOOD -> img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/sand&water.jpg"));
+                case DRY -> img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/sand.jpg"));
+                case SUBMERGED -> img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/water.jpg"));
+            }
         }
         return img;
     }
@@ -155,8 +146,8 @@ public class CellState {
             e.printStackTrace();
         }
 
-        for(int j = 0; j < nbImages; j++) {
-            g2d.drawImage(images.get(j), (int)(Math.cos(a)*15)+30, (int)(Math.sin(a)*10)+30, null);
+        for (BufferedImage image : images) {
+            g2d.drawImage(image, (int) (Math.cos(a) * 15) + 30, (int) (Math.sin(a) * 10) + 30, null);
             a += angle;
         }
         g2d.dispose();

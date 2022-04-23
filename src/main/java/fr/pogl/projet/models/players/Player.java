@@ -1,5 +1,6 @@
 package fr.pogl.projet.models.players;
 
+import fr.pogl.projet.controlers.Game;
 import fr.pogl.projet.models.gridManager.CellState;
 import fr.pogl.projet.models.gridManager.Artefacts;
 import fr.pogl.projet.models.gridManager.Coordinates;
@@ -20,12 +21,19 @@ public abstract class Player {
     private boolean[] artefactsKeys;
     private int artefacts;
     private HashMap<SpecialActions, Integer> inventory;
+    private boolean alive;
 
     public Player(String name) {
         this.name = name;
-        this.coordinates = new Coordinates(0, 0);
+        this.coordinates = new Coordinates(0, 4);
         resetCounter();
+        inventory = new HashMap<SpecialActions, Integer>();
+        inventory.put(SpecialActions.HELICOPTER, 0);
+        inventory.put(SpecialActions.SAND_BAG, 0);
+        alive = true;
     }
+
+    public boolean isAlive() { return alive; }
 
     public Collection<PlayerAction> getAvailableActions() {
         return new ArrayList<>(Arrays.asList(PlayerAction.values()));
@@ -76,25 +84,24 @@ public abstract class Player {
         grid[coordinates.getX()][coordinates.getY()].addPlayer(this);
     }
 
-    public boolean moveTo(Coordinates choseCoord, CellState[][] grid) {
+    public void moveTo(Coordinates choseCoord, CellState[][] grid) {
         if (isInRange(choseCoord)) {
             if (grid[choseCoord.getX()][choseCoord.getY()].getWaterLevel() == WaterLevel.SUBMERGED) {
                 System.out.println("Impossible de se deplacer sur une case submergee !");
             } else {
                 move(choseCoord, grid);
                 this.decreaseCounter();
-                return true;
             }
         }
-        return false;
     }
 
-    public boolean helicopter(Coordinates choseCoord, CellState[][] grid) {
-        if (grid[choseCoord.getX()][choseCoord.getY()].getWaterLevel() != WaterLevel.SUBMERGED) {
+    public void helicopter(Coordinates choseCoord, CellState[][] grid) {
+        if (hasHelicopter() && grid[choseCoord.getX()][choseCoord.getY()].getWaterLevel() != WaterLevel.SUBMERGED) {
             move(choseCoord, grid);
-            return true;
+            this.inventory.replace(SpecialActions.HELICOPTER, this.inventory.get(SpecialActions.HELICOPTER) - 1);
+            return;
         }
-        return false;
+        System.out.println("Tu n'as pas d'helicopteres !");
     }
 
     public boolean dry(Coordinates choseCoord, CellState[][] grid) {
@@ -107,23 +114,25 @@ public abstract class Player {
                 case FLOOD -> {
                     grid[choseCoord.getX()][choseCoord.getY()].setWaterLevel(WaterLevel.DRY);
                     this.decreaseCounter();
-                    return true;
                 }
                 case SUBMERGED -> System.out.println("Impossible d'assécher une case submerge !");
             }
-        }
-        return false;
-    }
-
-    public boolean sandBag(Coordinates choseCoord, CellState[][] grid) {
-        if (dry(choseCoord, grid)) {
-            this.increaseCounter();
             return true;
         }
         return false;
     }
 
-    public boolean pick(CellState[][] grid) {
+    public boolean sandBag(Coordinates choseCoord, CellState[][] grid) {
+        if (hasSandBag() && dry(choseCoord, grid)) {
+            this.increaseCounter();
+            this.inventory.replace(SpecialActions.SAND_BAG, this.inventory.get(SpecialActions.SAND_BAG) - 1);
+            return true;
+        }
+        System.out.println("Tu n'as pas de sac de sable !");
+        return false;
+    }
+
+    public void pick(CellState[][] grid) {
         CellState cell = grid[coordinates.getX()][coordinates.getY()];
         if (cell.hasArtefact()) {
             Artefacts a = cell.getArtefact();
@@ -132,20 +141,20 @@ public abstract class Player {
                 cell.removeArtefacts();
                 this.artefacts++;
                 this.decreaseCounter();
-                return true;
             } else {
                 System.out.println("Vous ne pouvez pas recupere l'artefact de " + a + " vous n'avez pas la bonne cle.");
             }
         } else {
             System.out.println("Dommage la cle n'est pas la");
         }
-        return false;
     }
 
-    /**
-    public void searchKey(@NotNull HashMap<Coordinates, Artefacts> keysMap, Grid g) {
-        if (keysMap.containsKey(this.coordinates)) {
-            Artefacts a = keysMap.get(this.coordinates);
+
+    public void searchKey(CellState[][] grid) {
+        CellState cell = grid[this.coordinates.getX()][this.coordinates.getY()];
+        if (cell.hasKey()) {
+            Artefacts a = cell.getArtefact();
+            cell.removeArtefacts();
             if (hasKey(a)) {
                 System.out.println("La cle de " + a + " est deja en votre possession !");
             } else {
@@ -155,18 +164,18 @@ public abstract class Player {
         } else {
             System.out.println("Il n'y a pas de cles sur cette case !");
             double r = Math.random();
-            if (r < 1/3) {
+            if (r < 1 / 3) {
                 System.out.println("Oh non la case est s'inonde !");
-                g.flood(this.coordinates);
-            } else if (r < 3/6) {
-                this.inventory.put(SpecialActions.SAND_BAG, 1 + this.inventory.get(SpecialActions.SAND_BAG));
+                cell.flood();
+            } else if (r < 3 / 6) {
+                this.inventory.replace(SpecialActions.SAND_BAG, 1 + this.inventory.get(SpecialActions.SAND_BAG));
                 System.out.println("Tu as tout de meme trouve un sac de sable !");
-            } else if (r < 4/6) {
-                this.inventory.put(SpecialActions.HELICOPTER, 1 + this.inventory.get(SpecialActions.HELICOPTER));
+            } else if (r < 4 / 6) {
+                this.inventory.replace(SpecialActions.HELICOPTER, 1 + this.inventory.get(SpecialActions.HELICOPTER));
                 System.out.println("Tu as tout de meme trouve un helicoptere !");
             }
         }
-    }**/
+    }
 
     public void exchangeKey(@NotNull Player other, Artefacts a) {
         if (this.coordinates.absDiff(other.getCoordinates()) != 0) {

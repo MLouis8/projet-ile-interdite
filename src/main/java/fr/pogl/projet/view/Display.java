@@ -23,7 +23,7 @@ public class Display extends JFrame {
 
     public void showCreatePlayerMenu() {
         frame.getContentPane().add(
-                new CreatePlayerGrid(playersBuilder, () -> {
+                new CreatePlayerGrid(playersBuilder, game, () -> {
                     frame.getContentPane().removeAll();
                     showGameMenu();
                 }));

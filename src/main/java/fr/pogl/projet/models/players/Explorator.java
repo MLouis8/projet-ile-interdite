@@ -21,14 +21,11 @@ public class Explorator extends Player {
     @Override
     public boolean isInRange(@NotNull Coordinates coord) {
         int absDiff = this.getCoordinates().absDiff(coord);
-        int xDiff = this.getCoordinates().absDiffX(coord);
-        int yDiff = this.getCoordinates().absDiffY(coord);
-
-        if ( ( absDiff > 1) || ( (yDiff == xDiff) && (absDiff > 2) ) ) {
+        if (absDiff == 1 || (this.getCoordinates().absDiffX(coord) == this.getCoordinates().absDiffY(coord) && absDiff == 2)) {
+            return true;
+        } else {
             System.out.println("Deplacement impossible : case injoignable");
             return false;
-        } else {
-            return true;
         }
     }
 

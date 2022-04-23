@@ -1,6 +1,7 @@
 package fr.pogl.projet.view;
 
 import fr.pogl.projet.controlers.Callback;
+import fr.pogl.projet.controlers.Game;
 import fr.pogl.projet.controlers.PlayerCollection;
 import fr.pogl.projet.models.players.PlayerType;
 
@@ -9,7 +10,7 @@ import java.awt.*;
 import java.util.Objects;
 
 public class CreatePlayerGrid extends JPanel {
-    public CreatePlayerGrid(PlayerCollection playersBuilder, Callback callback) {
+    public CreatePlayerGrid(PlayerCollection playersBuilder, Game game, Callback callback) {
         Color BG = Color.BLACK;
         setBackground(BG);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -26,11 +27,18 @@ public class CreatePlayerGrid extends JPanel {
         typeInput.add(typeComboBox);
         add(typeInput);
 
+        JPanel keysInput = new JPanel();
+        keysInput.add(new JLabel("Number of Keys per artefact: "));
+        JSpinner keysNumber = new JSpinner(new SpinnerNumberModel(1, 1, 4, 1));
+        keysInput.add(keysNumber);
+        add(keysInput);
+
         JPanel validate = new JPanel();
         JButton finish = new JButton("Finish");
         finish.addActionListener(e -> {
             playersBuilder.addPlayer(name.getText(),
                     (PlayerType) Objects.requireNonNull(typeComboBox.getSelectedItem()));
+                    game.setNbKeys((Integer) keysNumber.getValue());
             callback.call();
         });
         validate.add(finish);

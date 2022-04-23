@@ -18,7 +18,7 @@ public class PlayerTurn extends JPanel {
     private final JLabel modeLabel = new JLabel();
     private final JLabel numberOfPlayers = new JLabel();
 
-    JPanel buttons = new JPanel();
+    final JPanel buttons = new JPanel();
 
     public PlayerTurn(@NotNull Game game) {
         this.game = game;
@@ -58,8 +58,6 @@ public class PlayerTurn extends JPanel {
         JButton endTurn = new JButton("End Turn");
         endTurn.addActionListener(e -> nextTurn());
         buttons.add(endTurn);
-        if (player.getActionsLeft() == 0)
-            nextTurn();
     }
 
     private void nextTurn() {

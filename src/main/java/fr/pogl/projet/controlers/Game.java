@@ -14,6 +14,7 @@ public class Game {
     private PlayerCollection playerCollection;
     private Coordinates heliport;
     private CellState[][] grid;
+    private int nbKeys;
 
     public void start() {
         this.playerCollection = new PlayerCollection();
@@ -22,6 +23,8 @@ public class Game {
         display.showCreatePlayerMenu();
     }
 
+    public void setNbKeys(int n) { nbKeys = n; }
+
     public int getNumberPlayers() { return playerCollection.get().size(); }
 
     public CellState[][] getGrid() { return grid; }
@@ -29,8 +32,10 @@ public class Game {
     int index = 0;
 
     public void initializeGrid() {
+        System.out.println("Start init");
         CellState[][] newGrid = new CellState[9][9];
         Coordinates[] a = randomCoords(8);
+        System.out.println("End random");
 
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
@@ -42,17 +47,18 @@ public class Game {
             newGrid[0][4].addPlayer(this.playerCollection.get().get(i));
 
         newGrid[a[0].getX()][a[0].getY()].setArtefacts(Artefacts.EARTH, Artefacts.NULL);
-        newGrid[a[0].getX()][a[0].getY()].setArtefacts(Artefacts.NULL, Artefacts.EARTH);
-        newGrid[a[1].getX()][a[1].getY()].setArtefacts(Artefacts.FIRE, Artefacts.NULL);
-        newGrid[a[1].getX()][a[1].getY()].setArtefacts(Artefacts.NULL, Artefacts.FIRE);
-        newGrid[a[2].getX()][a[2].getY()].setArtefacts(Artefacts.WIND, Artefacts.NULL);
-        newGrid[a[2].getX()][a[2].getY()].setArtefacts(Artefacts.NULL, Artefacts.WIND);
-        newGrid[a[3].getX()][a[3].getY()].setArtefacts(Artefacts.WATER, Artefacts.NULL);
-        newGrid[a[3].getX()][a[3].getY()].setArtefacts(Artefacts.NULL, Artefacts.WATER);
+        newGrid[a[1].getX()][a[1].getY()].setArtefacts(Artefacts.NULL, Artefacts.EARTH);
+        newGrid[a[2].getX()][a[2].getY()].setArtefacts(Artefacts.FIRE, Artefacts.NULL);
+        newGrid[a[3].getX()][a[3].getY()].setArtefacts(Artefacts.NULL, Artefacts.FIRE);
+        newGrid[a[4].getX()][a[4].getY()].setArtefacts(Artefacts.WIND, Artefacts.NULL);
+        newGrid[a[5].getX()][a[5].getY()].setArtefacts(Artefacts.NULL, Artefacts.WIND);
+        newGrid[a[6].getX()][a[6].getY()].setArtefacts(Artefacts.WATER, Artefacts.NULL);
+        newGrid[a[7].getX()][a[7].getY()].setArtefacts(Artefacts.NULL, Artefacts.WATER);
 
         newGrid[heliport.getX()][heliport.getY()].setHeliport();
 
         this.grid = newGrid;
+        System.out.println("End init");
     }
 
     public Player doPlayerTurn() {
