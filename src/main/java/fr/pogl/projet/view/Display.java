@@ -22,19 +22,23 @@ public class Display extends JFrame {
     }
 
     public void showCreatePlayerMenu() {
-        frame.getContentPane().add(
-                new CreatePlayerGrid(playersBuilder, game, () -> {
-                    frame.getContentPane().removeAll();
-                    showGameMenu();
-                }));
+        frame.getContentPane().add(new CreatePlayerGrid(playersBuilder, game, this::showGameMenu));
         frame.pack();
         frame.setVisible(true);
     }
 
     public void showGameMenu() {
+        frame.getContentPane().removeAll();
         game.initializeGrid();
         PlayerTurn playerTurn = new PlayerTurn(game);
         frame.getContentPane().add(playerTurn);
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    public void showGameOver() {
+        frame.getContentPane().removeAll();
+        frame.getContentPane().add(new GameOver());
         frame.pack();
         frame.setVisible(true);
     }
