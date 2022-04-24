@@ -4,6 +4,11 @@ public enum PlayerAction {
 
     MOVE,
     DRY_OUT,
-    PICK_ARTEFACT
+    SEARCH_KEY,
+    PICK_ARTEFACT,
+    EXCHANGE_KEY,
+    SAND_BAG,
+    HELICOPTER,
+    NAV
 
 }

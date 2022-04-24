@@ -19,7 +19,6 @@ public class CellState {
     private int numberPlayers;
     private Artefacts artefact;
     private Artefacts key;
-    private boolean heliport;
 
     public CellState(int n) {
         waterLevel = WaterLevel.DRY;
@@ -28,8 +27,6 @@ public class CellState {
         artefact = Artefacts.NULL;
         key = Artefacts.NULL;
     }
-
-    public boolean isHeliport() { return waterLevel == WaterLevel.NULL; }
 
     public void setHeliport() { waterLevel = WaterLevel.NULL; }
 
@@ -44,8 +41,9 @@ public class CellState {
     public void setArtefacts(Artefacts a, Artefacts k) {
         artefact = a;
         key = k;
-        System.out.println(hasArtefact());
     }
+
+    public boolean isFlooded() { return waterLevel == WaterLevel.SUBMERGED; }
 
     public void removeArtefacts() {
         artefact = Artefacts.NULL;

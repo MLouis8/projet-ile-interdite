@@ -8,13 +8,12 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
-import java.util.HashMap;
-import java.util.Map;
 
 public class PlayerTurn extends JPanel {
 
     private PlayerAction action;
     private Player player;
+    private Player targetedPlayer;
     private final Game game;
 
     private final JLabel playerNameLabel = new JLabel();
@@ -27,6 +26,7 @@ public class PlayerTurn extends JPanel {
     public PlayerTurn(@NotNull Game game) {
         this.game = game;
         player = this.game.doPlayerTurn();
+        targetedPlayer = player;
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         add(playerNameLabel);
@@ -41,7 +41,10 @@ public class PlayerTurn extends JPanel {
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
         game.getPlayerCollection().get().forEach(player -> {
             JButton playerButton = new JButton(player.getName());
-            ActionListener listener = e -> System.out.println("player button clicked");
+            ActionListener listener = e -> {
+                System.out.println("player button clicked");
+                targetedPlayer = player;
+            };
             playerButton.addActionListener(listener);
             player.getOnDeathEvents().add((p) -> {
                         playerButton.setBackground(Color.gray);
@@ -62,6 +65,8 @@ public class PlayerTurn extends JPanel {
     public Player getPlayer() {
         return player;
     }
+
+    public Player getTargetedPlayer() { return targetedPlayer; }
 
     public void refresh() {
         playerNameLabel.setText("player: " + player.getName());

@@ -5,6 +5,7 @@ import fr.pogl.projet.models.gridManager.Artefacts;
 import fr.pogl.projet.models.gridManager.Coordinates;
 import fr.pogl.projet.models.players.Player;
 import fr.pogl.projet.models.players.PlayerAction;
+import fr.pogl.projet.models.players.PlayerType;
 import fr.pogl.projet.view.Display;
 
 import static java.lang.Math.random;
@@ -15,6 +16,7 @@ public class Game {
     private Coordinates heliport;
     private CellState[][] grid;
     private int nbKeys;
+    private Coordinates[] crucialCells;
 
     public void start() {
         this.playerCollection = new PlayerCollection();
@@ -32,10 +34,8 @@ public class Game {
     int index = 0;
 
     public void initializeGrid() {
-        System.out.println("Start init");
         CellState[][] newGrid = new CellState[9][9];
-        Coordinates[] a = randomCoords(8);
-        System.out.println("End random");
+        Coordinates[] a = randomCoords(4 + nbKeys * 4);
 
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
@@ -46,19 +46,23 @@ public class Game {
         for (int i = 0; i < this.playerCollection.get().size(); i++)
             newGrid[0][4].addPlayer(this.playerCollection.get().get(i));
 
+        this.crucialCells = a;
+
         newGrid[a[0].getX()][a[0].getY()].setArtefacts(Artefacts.EARTH, Artefacts.NULL);
-        newGrid[a[1].getX()][a[1].getY()].setArtefacts(Artefacts.NULL, Artefacts.EARTH);
-        newGrid[a[2].getX()][a[2].getY()].setArtefacts(Artefacts.FIRE, Artefacts.NULL);
-        newGrid[a[3].getX()][a[3].getY()].setArtefacts(Artefacts.NULL, Artefacts.FIRE);
-        newGrid[a[4].getX()][a[4].getY()].setArtefacts(Artefacts.WIND, Artefacts.NULL);
-        newGrid[a[5].getX()][a[5].getY()].setArtefacts(Artefacts.NULL, Artefacts.WIND);
-        newGrid[a[6].getX()][a[6].getY()].setArtefacts(Artefacts.WATER, Artefacts.NULL);
-        newGrid[a[7].getX()][a[7].getY()].setArtefacts(Artefacts.NULL, Artefacts.WATER);
+        newGrid[a[1].getX()][a[1].getY()].setArtefacts(Artefacts.FIRE, Artefacts.NULL);
+        newGrid[a[2].getX()][a[2].getY()].setArtefacts(Artefacts.WIND, Artefacts.NULL);
+        newGrid[a[3].getX()][a[3].getY()].setArtefacts(Artefacts.WATER, Artefacts.NULL);
+
+        for (int i = 0; i < nbKeys; i++) {
+            newGrid[a[4 + i * 4].getX()][a[4 + i * 4].getY()].setArtefacts(Artefacts.NULL, Artefacts.EARTH);
+            newGrid[a[5 + i * 4].getX()][a[5 + i * 4].getY()].setArtefacts(Artefacts.NULL, Artefacts.FIRE);
+            newGrid[a[6 + i * 4].getX()][a[6 + i * 4].getY()].setArtefacts(Artefacts.NULL, Artefacts.WATER);
+            newGrid[a[7 + i * 4].getX()][a[7 + i * 4].getY()].setArtefacts(Artefacts.NULL, Artefacts.WIND);
+        }
 
         newGrid[heliport.getX()][heliport.getY()].setHeliport();
 
         this.grid = newGrid;
-        System.out.println("End init");
     }
 
     public Player doPlayerTurn() {
@@ -101,12 +105,20 @@ public class Game {
         return artefactCounter == 4;
     }
 
-    public void activate(Coordinates c, PlayerAction a, Player p) {
-        if (p.getActionsLeft() > 0) {
+    public void activate(Coordinates c, PlayerAction a, Player p1, Player p2) {
+        if (p1.getActionsLeft() > 0) {
             switch (a) {
-                case MOVE -> p.moveTo(c, grid);
-                case DRY_OUT -> p.dry(c, grid);
-                case PICK_ARTEFACT -> p.pick(grid);
+                case MOVE -> p1.moveTo(c, grid);
+                case DRY_OUT -> p1.dry(c, grid);
+                case PICK_ARTEFACT -> p1.pick(grid);
+                case SEARCH_KEY -> p1.searchKey(grid);
+                case SAND_BAG -> p1.sandBag(c, grid);
+                case HELICOPTER -> p1.helicopter(c, grid);
+                case EXCHANGE_KEY -> p1.exchangeKey(p2, Artefacts.NULL);
+                case NAV -> {
+                    if (p1.getType() == PlayerType.NAVIGATOR)
+                        p1.moveOther(p2, c, grid);
+                }
                 default -> throw new IllegalStateException("Unexpected value: " + a);
             }
         }

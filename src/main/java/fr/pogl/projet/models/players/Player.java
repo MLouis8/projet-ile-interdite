@@ -1,10 +1,8 @@
 package fr.pogl.projet.models.players;
 
-import fr.pogl.projet.controlers.Game;
 import fr.pogl.projet.models.gridManager.CellState;
 import fr.pogl.projet.models.gridManager.Artefacts;
 import fr.pogl.projet.models.gridManager.Coordinates;
-import fr.pogl.projet.models.SpecialActions;
 import fr.pogl.projet.models.gridManager.WaterLevel;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,7 +16,7 @@ public abstract class Player {
     private int actionCounter;
     private boolean[] artefactsKeys;
     private int artefacts;
-    private HashMap<SpecialActions, Integer> inventory;
+    private HashMap<PlayerAction, Integer> inventory;
     private boolean alive;
     private List<Consumer<Player>> onDeath;
 
@@ -26,11 +24,12 @@ public abstract class Player {
         this.name = name;
         this.coordinates = new Coordinates(0, 4);
         resetCounter();
-        inventory = new HashMap<SpecialActions, Integer>();
-        inventory.put(SpecialActions.HELICOPTER, 0);
-        inventory.put(SpecialActions.SAND_BAG, 0);
+        inventory = new HashMap<>();
+        inventory.put(PlayerAction.HELICOPTER, 0);
+        inventory.put(PlayerAction.SAND_BAG, 0);
         alive = true;
         this.onDeath = new ArrayList<>();
+        this.artefactsKeys = new boolean[]{false, false, false, false};
     }
 
     public List<Consumer<Player>> getOnDeathEvents() {
@@ -93,11 +92,11 @@ public abstract class Player {
     }
 
     public boolean hasSandBag() {
-        return this.inventory.get(SpecialActions.SAND_BAG) > 0;
+        return this.inventory.get(PlayerAction.SAND_BAG) > 0;
     }
 
     public boolean hasHelicopter() {
-        return this.inventory.get(SpecialActions.HELICOPTER) > 0;
+        return this.inventory.get(PlayerAction.HELICOPTER) > 0;
     }
 
     public boolean isInRange(@NotNull Coordinates coord) {
@@ -129,7 +128,7 @@ public abstract class Player {
     public void helicopter(Coordinates choseCoord, CellState[][] grid) {
         if (hasHelicopter() && grid[choseCoord.getX()][choseCoord.getY()].getWaterLevel() != WaterLevel.SUBMERGED) {
             move(choseCoord, grid);
-            this.inventory.replace(SpecialActions.HELICOPTER, this.inventory.get(SpecialActions.HELICOPTER) - 1);
+            this.inventory.replace(PlayerAction.HELICOPTER, this.inventory.get(PlayerAction.HELICOPTER) - 1);
             return;
         }
         System.out.println("Tu n'as pas d'helicopteres !");
@@ -153,14 +152,12 @@ public abstract class Player {
         return false;
     }
 
-    public boolean sandBag(Coordinates choseCoord, CellState[][] grid) {
+    public void sandBag(Coordinates choseCoord, CellState[][] grid) {
         if (hasSandBag() && dry(choseCoord, grid)) {
             this.increaseCounter();
-            this.inventory.replace(SpecialActions.SAND_BAG, this.inventory.get(SpecialActions.SAND_BAG) - 1);
-            return true;
+            this.inventory.replace(PlayerAction.SAND_BAG, this.inventory.get(PlayerAction.SAND_BAG) - 1);
         }
         System.out.println("Tu n'as pas de sac de sable !");
-        return false;
     }
 
     public void pick(CellState[][] grid) {
@@ -184,7 +181,7 @@ public abstract class Player {
     public void searchKey(CellState[][] grid) {
         CellState cell = grid[this.coordinates.getX()][this.coordinates.getY()];
         if (cell.hasKey()) {
-            Artefacts a = cell.getArtefact();
+            Artefacts a = cell.getKey();
             cell.removeArtefacts();
             if (hasKey(a)) {
                 System.out.println("La cle de " + a + " est deja en votre possession !");
@@ -193,22 +190,22 @@ public abstract class Player {
                 this.gainKey(a);
             }
         } else {
-            System.out.println("Il n'y a pas de cles sur cette case !");
+            System.out.println("Il n'y a pas de clefs sur cette case !");
             double r = Math.random();
-            if (r < 1 / 3) {
+            if (r < 1. / 3) {
                 System.out.println("Oh non la case est s'inonde !");
                 cell.flood();
-            } else if (r < 3 / 6) {
-                this.inventory.replace(SpecialActions.SAND_BAG, 1 + this.inventory.get(SpecialActions.SAND_BAG));
+            } else if (r < 3. / 6) {
+                this.inventory.replace(PlayerAction.SAND_BAG, 1 + this.inventory.get(PlayerAction.SAND_BAG));
                 System.out.println("Tu as tout de meme trouve un sac de sable !");
-            } else if (r < 4 / 6) {
-                this.inventory.replace(SpecialActions.HELICOPTER, 1 + this.inventory.get(SpecialActions.HELICOPTER));
+            } else if (r < 4. / 6) {
+                this.inventory.replace(PlayerAction.HELICOPTER, 1 + this.inventory.get(PlayerAction.HELICOPTER));
                 System.out.println("Tu as tout de meme trouve un helicoptere !");
             }
         }
     }
 
-    public void exchangeKey(@NotNull Player other, Artefacts a) {
+    public void exchangeKey(Player other, Artefacts a) {
         if (this.coordinates.absDiff(other.getCoordinates()) != 0) {
             System.out.println("Les joueurs ne sont pas sur la meme case !");
             return;
@@ -223,4 +220,6 @@ public abstract class Player {
             System.out.println("Erreur la cle n'est possede par aucun des deux joueurs");
         }
     }
+
+    public void moveOther(Player p, Coordinates choseCoord, CellState[][] grid) {}
 }
