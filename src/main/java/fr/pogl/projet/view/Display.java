@@ -4,6 +4,7 @@ import fr.pogl.projet.controlers.PlayerCollection;
 import fr.pogl.projet.controlers.Game;
 
 import javax.swing.*;
+import java.util.function.Consumer;
 
 public class Display extends JFrame {
 
@@ -36,9 +37,9 @@ public class Display extends JFrame {
         frame.setVisible(true);
     }
 
-    public void showGameOver() {
+    public void showGameOver(String msg) {
         frame.getContentPane().removeAll();
-        frame.getContentPane().add(new GameOver());
+        frame.getContentPane().add(new GameOver(msg));
         frame.pack();
         frame.setVisible(true);
     }

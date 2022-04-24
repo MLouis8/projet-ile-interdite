@@ -21,7 +21,6 @@ public class MapGrid extends JPanel {
                 JButton button = new JButton(new ImageIcon(cell.getIcon()));
 
                 button.addActionListener((e) -> {
-                    //System.out.println("Clicked on " + coord.getX() + " " + coord.getY() + " with action " + playerTurn.getAction());
                     game.activate(coord, playerTurn.getAction(), playerTurn.getPlayer(), playerTurn.getTargetedPlayer());
                     playerTurn.refresh();
                     updateButtons(this, game.getGrid());

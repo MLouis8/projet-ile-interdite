@@ -63,8 +63,11 @@ public class CellState {
 
     public void removePlayer(Player p) {
         for (int i = 0; i < numberPlayers; i++) {
-            if (p.getClass() == players[i].getClass()) {
+            if (p.getType() == players[i].getType()) {
                 players[i] = null;
+                for (int j = i+1; j < numberPlayers; j++) {
+                    players[j-1] = players[j];
+                }
                 numberPlayers--;
                 return;
             }

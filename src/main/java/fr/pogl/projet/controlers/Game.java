@@ -3,6 +3,7 @@ package fr.pogl.projet.controlers;
 import fr.pogl.projet.models.gridManager.CellState;
 import fr.pogl.projet.models.gridManager.Artefacts;
 import fr.pogl.projet.models.gridManager.Coordinates;
+import fr.pogl.projet.models.gridManager.WaterLevel;
 import fr.pogl.projet.models.players.Player;
 import fr.pogl.projet.models.players.PlayerAction;
 import fr.pogl.projet.models.players.PlayerType;
@@ -17,13 +18,16 @@ public class Game {
     private CellState[][] grid;
     private int nbKeys;
     private Coordinates[] crucialCells;
+    private Display display;
 
     public void start() {
         this.playerCollection = new PlayerCollection();
         this.heliport = new Coordinates(8, 4);
-        Display display = new Display(playerCollection, this);
+        display = new Display(playerCollection, this);
         display.showCreatePlayerMenu();
     }
+
+    public Coordinates getHeliport() { return heliport; }
 
     public void setNbKeys(int n) { nbKeys = n; }
 
@@ -43,8 +47,9 @@ public class Game {
             }
         }
 
-        for (int i = 0; i < this.playerCollection.get().size(); i++)
+        for (int i = 0; i < this.playerCollection.get().size(); i++) {
             newGrid[0][4].addPlayer(this.playerCollection.get().get(i));
+        }
 
         this.crucialCells = a;
 
@@ -95,7 +100,51 @@ public class Game {
         this.grid[c[2].getX()][c[2].getY()].flood();
     }
 
-    public boolean isWon() {
+    public void checkEnd(Player p) {
+        if (p.getCoordinates().absDiff(this.heliport) == 0)
+            if (isWon())
+                stop("Well done! You've won!");
+
+        if (blockedMovement(p)) {
+            p.kill();
+            stop("Game Over");
+        }
+    }
+
+    private boolean blockedMovement(Player p) {
+        if (p.getType() == PlayerType.PILOT || p.getType() == PlayerType.DIVER || p.hasHelicopter())
+            return false;
+
+        int x = p.getCoordinates().getX();
+        int y = p.getCoordinates().getY();
+
+        boolean blockedBottom;
+        boolean blockedTop;
+        boolean blockedLeft;
+        boolean blockedRight;
+
+        if (p.getType() == PlayerType.EXPLORATOR) {
+            blockedBottom = (x == 8) || (grid[x+1][y].isFlooded() && ((y == 8) || grid[x+1][y+1].isFlooded()) && ((y == 0) || grid[x+1][y-1].isFlooded()));
+            blockedTop = (x == 0) || (grid[x-1][y].isFlooded() && ((y == 8) || grid[x-1][y+1].isFlooded()) && ((y == 0) || grid[x-1][y-1].isFlooded()));
+            blockedRight = (y == 8) || (grid[x][y+1].isFlooded() && ((x == 8) || grid[x+1][y+1].isFlooded()) && ((x == 0) || grid[x-1][y+1].isFlooded()));
+            blockedLeft = (y == 0) || (grid[x][y-1].isFlooded() && ((x == 8) || grid[x+1][y-1].isFlooded()) && ((x == 0) || grid[x-1][y-1].isFlooded()));
+        } else {
+            blockedBottom = (x == 8) || grid[x + 1][y].isFlooded();
+            blockedTop = (x == 0) || grid[x - 1][y].isFlooded();
+            blockedRight = (y == 8) || grid[x][y + 1].isFlooded();
+            blockedLeft = (y == 0) || grid[x][y - 1].isFlooded();
+        }
+        if (blockedLeft && blockedBottom && blockedRight && blockedTop)
+            return true;
+        else
+            return false;
+    }
+
+    public void stop(String msg) {
+        display.showGameOver(msg);
+    }
+
+    private boolean isWon() {
         int artefactCounter = 0;
         for (Player p : playerCollection.get()) {
             if (p.getCoordinates().absDiff(this.heliport) != 0)
@@ -121,6 +170,8 @@ public class Game {
                 }
                 default -> throw new IllegalStateException("Unexpected value: " + a);
             }
+        } else {
+            System.out.println("Vous n'avez plus d'action.");
         }
     }
 

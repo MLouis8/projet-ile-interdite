@@ -95,6 +95,10 @@ public abstract class Player {
         return this.inventory.get(PlayerAction.SAND_BAG) > 0;
     }
 
+    public int sandBagNumbers() { return this.inventory.get(PlayerAction.SAND_BAG); }
+
+    public int helicoptersNumbers() { return this.inventory.get(PlayerAction.HELICOPTER); }
+
     public boolean hasHelicopter() {
         return this.inventory.get(PlayerAction.HELICOPTER) > 0;
     }

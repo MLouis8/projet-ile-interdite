@@ -19,7 +19,9 @@ public class PlayerTurn extends JPanel {
     private final JLabel playerNameLabel = new JLabel();
     private final JLabel actionsAmountLabel = new JLabel();
     private final JLabel modeLabel = new JLabel();
-    private final JLabel numberOfPlayers = new JLabel();
+    private final JLabel numberOfPlayersLabel = new JLabel();
+    private final JLabel helicoptersLabel = new JLabel();
+    private final JLabel sandBagsLabel = new JLabel();
 
     final JPanel buttons = new JPanel();
 
@@ -32,7 +34,9 @@ public class PlayerTurn extends JPanel {
         add(playerNameLabel);
         add(actionsAmountLabel);
         add(modeLabel, SwingConstants.CENTER);
-        add(numberOfPlayers);
+        add(numberOfPlayersLabel);
+        add(helicoptersLabel);
+        add(sandBagsLabel);
         add(buttons);
 
         JPanel panel = new JPanel();
@@ -71,13 +75,16 @@ public class PlayerTurn extends JPanel {
     public void refresh() {
         playerNameLabel.setText("player: " + player.getName());
         actionsAmountLabel.setText("Actions: " + player.getActionsLeft());
-        modeLabel.setText("Mode: moving");
-        numberOfPlayers.setText("Number of players: " + game.getNumberPlayers());
+        modeLabel.setText("Mode: default");
+        numberOfPlayersLabel.setText("Number of players: " + game.getNumberPlayers());
+        helicoptersLabel.setText("Helicopters: " + player.helicoptersNumbers());
+        sandBagsLabel.setText("Sand Bags: " + player.sandBagNumbers());
 
         if (action == null)
             action = PlayerAction.MOVE;
         buttons.removeAll();
         for (PlayerAction action : player.getAvailableActions()) {
+            System.out.println(action.toString());
             JButton modeButton = new JButton(action.toString());
             modeButton.addActionListener(e -> {
                 modeLabel.setText("Mode: " + action);
@@ -91,8 +98,9 @@ public class PlayerTurn extends JPanel {
     }
 
     private void nextTurn() {
-        player = game.doPlayerTurn();
         game.randomFlood();
+        player = game.doPlayerTurn();
+        game.checkEnd(player);
         refresh();
     }
 }
