@@ -84,7 +84,6 @@ public class PlayerTurn extends JPanel {
             action = PlayerAction.MOVE;
         buttons.removeAll();
         for (PlayerAction action : player.getAvailableActions()) {
-            System.out.println(action.toString());
             JButton modeButton = new JButton(action.toString());
             modeButton.addActionListener(e -> {
                 modeLabel.setText("Mode: " + action);
@@ -93,7 +92,7 @@ public class PlayerTurn extends JPanel {
             buttons.add(modeButton);
         }
         JButton endTurn = new JButton("End Turn");
-        endTurn.addActionListener(e -> nextTurn());
+         endTurn.addActionListener(e -> nextTurn());
         buttons.add(endTurn);
     }
 

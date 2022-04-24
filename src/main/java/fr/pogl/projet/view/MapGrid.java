@@ -21,9 +21,10 @@ public class MapGrid extends JPanel {
                 JButton button = new JButton(new ImageIcon(cell.getIcon()));
 
                 button.addActionListener((e) -> {
-                    game.activate(coord, playerTurn.getAction(), playerTurn.getPlayer(), playerTurn.getTargetedPlayer());
-                    playerTurn.refresh();
-                    updateButtons(this, game.getGrid());
+                    if (game.activate(coord, playerTurn.getAction(), playerTurn.getPlayer(), playerTurn.getTargetedPlayer())) {
+                        playerTurn.refresh();
+                        updateButtons(this, game.getGrid());
+                    }
                 });
 
                 Dimension BTN_PREF_SIZE = new Dimension(80, 80);
@@ -38,7 +39,7 @@ public class MapGrid extends JPanel {
 
         for (int i = 0; i < components.length; i++) {
             if (components[i] instanceof JButton button) {
-                CellState cell = cells[i /9][i%9];
+                CellState cell = cells[i / 9][i % 9];
                 button.setIcon(new ImageIcon(cell.getIcon()));
             }
         }

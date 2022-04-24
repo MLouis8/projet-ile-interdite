@@ -95,9 +95,13 @@ public abstract class Player {
         return this.inventory.get(PlayerAction.SAND_BAG) > 0;
     }
 
-    public int sandBagNumbers() { return this.inventory.get(PlayerAction.SAND_BAG); }
+    public int sandBagNumbers() {
+        return this.inventory.get(PlayerAction.SAND_BAG);
+    }
 
-    public int helicoptersNumbers() { return this.inventory.get(PlayerAction.HELICOPTER); }
+    public int helicoptersNumbers() {
+        return this.inventory.get(PlayerAction.HELICOPTER);
+    }
 
     public boolean hasHelicopter() {
         return this.inventory.get(PlayerAction.HELICOPTER) > 0;
@@ -121,11 +125,13 @@ public abstract class Player {
     public void moveTo(Coordinates choseCoord, CellState[][] grid) {
         if (isInRange(choseCoord)) {
             if (grid[choseCoord.getX()][choseCoord.getY()].getWaterLevel() == WaterLevel.SUBMERGED) {
-                System.out.println("Impossible de se deplacer sur une case submergee !");
+                throw new IllegalArgumentException("Impossible de se deplacer sur une case submergee !");
             } else {
                 move(choseCoord, grid);
                 this.decreaseCounter();
             }
+        } else {
+            throw new IllegalArgumentException("Impossible de se deplacer sur une case inaccessible !");
         }
     }
 
@@ -135,7 +141,7 @@ public abstract class Player {
             this.inventory.replace(PlayerAction.HELICOPTER, this.inventory.get(PlayerAction.HELICOPTER) - 1);
             return;
         }
-        System.out.println("Tu n'as pas d'helicopteres !");
+        throw new IllegalStateException("Tu n'as pas d'hélicoptère !");
     }
 
     public boolean dry(Coordinates choseCoord, CellState[][] grid) {
@@ -160,8 +166,9 @@ public abstract class Player {
         if (hasSandBag() && dry(choseCoord, grid)) {
             this.increaseCounter();
             this.inventory.replace(PlayerAction.SAND_BAG, this.inventory.get(PlayerAction.SAND_BAG) - 1);
+            return;
         }
-        System.out.println("Tu n'as pas de sac de sable !");
+        throw new IllegalStateException("Tu n'as pas de sac de sable ou c'est déjà sec!");
     }
 
     public void pick(CellState[][] grid) {
@@ -174,10 +181,10 @@ public abstract class Player {
                 this.artefacts++;
                 this.decreaseCounter();
             } else {
-                System.out.println("Vous ne pouvez pas recupere l'artefact de " + a + " vous n'avez pas la bonne cle.");
+                throw new IllegalStateException("Vous ne pouvez pas recupere l'artefact de " + a + " vous n'avez pas la bonne cle.");
             }
         } else {
-            System.out.println("Dommage la cle n'est pas la");
+            throw new IllegalStateException("Dommage la cle n'est pas la");
         }
     }
 
@@ -188,13 +195,12 @@ public abstract class Player {
             Artefacts a = cell.getKey();
             cell.removeArtefacts();
             if (hasKey(a)) {
-                System.out.println("La cle de " + a + " est deja en votre possession !");
+                throw new IllegalStateException("La cle de " + a + " est deja en votre possession !");
             } else {
                 System.out.println("Bien joue ! Vous avez recupere la cle de l'artefact de " + a);
                 this.gainKey(a);
             }
         } else {
-            System.out.println("Il n'y a pas de clefs sur cette case !");
             double r = Math.random();
             if (r < 1. / 3) {
                 System.out.println("Oh non la case est s'inonde !");
@@ -211,8 +217,7 @@ public abstract class Player {
 
     public void exchangeKey(Player other, Artefacts a) {
         if (this.coordinates.absDiff(other.getCoordinates()) != 0) {
-            System.out.println("Les joueurs ne sont pas sur la meme case !");
-            return;
+            throw new IllegalStateException("Les joueurs ne sont pas sur la meme case !");
         }
         if (this.hasKey(a)) {
             this.removeKey(a);
@@ -221,9 +226,10 @@ public abstract class Player {
             other.removeKey(a);
             this.gainKey(a);
         } else {
-            System.out.println("Erreur la cle n'est possede par aucun des deux joueurs");
+            throw new IllegalStateException("Erreur la cle n'est possede par aucun des deux joueurs");
         }
     }
 
-    public void moveOther(Player p, Coordinates choseCoord, CellState[][] grid) {}
+    public void moveOther(Player p, Coordinates choseCoord, CellState[][] grid) {
+    }
 }

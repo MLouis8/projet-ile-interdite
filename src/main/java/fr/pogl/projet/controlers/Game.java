@@ -27,13 +27,21 @@ public class Game {
         display.showCreatePlayerMenu();
     }
 
-    public Coordinates getHeliport() { return heliport; }
+    public Coordinates getHeliport() {
+        return heliport;
+    }
 
-    public void setNbKeys(int n) { nbKeys = n; }
+    public void setNbKeys(int n) {
+        nbKeys = n;
+    }
 
-    public int getNumberPlayers() { return playerCollection.get().size(); }
+    public int getNumberPlayers() {
+        return playerCollection.get().size();
+    }
 
-    public CellState[][] getGrid() { return grid; }
+    public CellState[][] getGrid() {
+        return grid;
+    }
 
     int index = 0;
 
@@ -79,13 +87,13 @@ public class Game {
 
     public Coordinates[] randomCoords(int nbCoords) {
         Coordinates[] coords = new Coordinates[nbCoords];
-        coords[0] = new Coordinates((int)(random()*9), (int)(random()*9));
+        coords[0] = new Coordinates((int) (random() * 9), (int) (random() * 9));
 
         for (int i = 0; i < nbCoords; i++) {
-            Coordinates cell = new Coordinates((int)(random()*9), (int)(random()*9));
+            Coordinates cell = new Coordinates((int) (random() * 9), (int) (random() * 9));
             for (int j = 0; j < i; j++) {
                 while ((coords[j].absDiff(cell) == 0) || (coords[j].absDiff(this.heliport) == 0))
-                    cell.set(new Coordinates((int)(random()*9), (int)(random()*9)));
+                    cell.set(new Coordinates((int) (random() * 9), (int) (random() * 9)));
             }
             coords[i] = cell;
         }
@@ -124,10 +132,10 @@ public class Game {
         boolean blockedRight;
 
         if (p.getType() == PlayerType.EXPLORATOR) {
-            blockedBottom = (x == 8) || (grid[x+1][y].isFlooded() && ((y == 8) || grid[x+1][y+1].isFlooded()) && ((y == 0) || grid[x+1][y-1].isFlooded()));
-            blockedTop = (x == 0) || (grid[x-1][y].isFlooded() && ((y == 8) || grid[x-1][y+1].isFlooded()) && ((y == 0) || grid[x-1][y-1].isFlooded()));
-            blockedRight = (y == 8) || (grid[x][y+1].isFlooded() && ((x == 8) || grid[x+1][y+1].isFlooded()) && ((x == 0) || grid[x-1][y+1].isFlooded()));
-            blockedLeft = (y == 0) || (grid[x][y-1].isFlooded() && ((x == 8) || grid[x+1][y-1].isFlooded()) && ((x == 0) || grid[x-1][y-1].isFlooded()));
+            blockedBottom = (x == 8) || (grid[x + 1][y].isFlooded() && ((y == 8) || grid[x + 1][y + 1].isFlooded()) && ((y == 0) || grid[x + 1][y - 1].isFlooded()));
+            blockedTop = (x == 0) || (grid[x - 1][y].isFlooded() && ((y == 8) || grid[x - 1][y + 1].isFlooded()) && ((y == 0) || grid[x - 1][y - 1].isFlooded()));
+            blockedRight = (y == 8) || (grid[x][y + 1].isFlooded() && ((x == 8) || grid[x + 1][y + 1].isFlooded()) && ((x == 0) || grid[x - 1][y + 1].isFlooded()));
+            blockedLeft = (y == 0) || (grid[x][y - 1].isFlooded() && ((x == 8) || grid[x + 1][y - 1].isFlooded()) && ((x == 0) || grid[x - 1][y - 1].isFlooded()));
         } else {
             blockedBottom = (x == 8) || grid[x + 1][y].isFlooded();
             blockedTop = (x == 0) || grid[x - 1][y].isFlooded();
@@ -154,25 +162,35 @@ public class Game {
         return artefactCounter == 4;
     }
 
-    public void activate(Coordinates c, PlayerAction a, Player p1, Player p2) {
-        if (p1.getActionsLeft() > 0) {
-            switch (a) {
-                case MOVE -> p1.moveTo(c, grid);
-                case DRY_OUT -> p1.dry(c, grid);
-                case PICK_ARTEFACT -> p1.pick(grid);
-                case SEARCH_KEY -> p1.searchKey(grid);
-                case SAND_BAG -> p1.sandBag(c, grid);
-                case HELICOPTER -> p1.helicopter(c, grid);
-                case EXCHANGE_KEY -> p1.exchangeKey(p2, Artefacts.NULL);
-                case NAV -> {
-                    if (p1.getType() == PlayerType.NAVIGATOR)
-                        p1.moveOther(p2, c, grid);
+    public boolean activate(Coordinates c, PlayerAction a, Player p1, Player p2) {
+        try {
+            if (p1.getActionsLeft() > 0) {
+                switch (a) {
+                    case MOVE -> p1.moveTo(c, grid);
+                    case DRY_OUT -> {
+                        if (!p1.dry(c, grid))
+                            throw new IllegalStateException("déjà vide");
+                    }
+                    case PICK_ARTEFACT -> p1.pick(grid);
+                    case SEARCH_KEY -> p1.searchKey(grid);
+                    case SAND_BAG -> p1.sandBag(c, grid);
+                    case HELICOPTER -> p1.helicopter(c, grid);
+                    case EXCHANGE_KEY -> p1.exchangeKey(p2, Artefacts.NULL);
+                    case NAV -> {
+                        if (p1.getType() == PlayerType.NAVIGATOR)
+                            p1.moveOther(p2, c, grid);
+                        else
+                            throw new IllegalStateException("Vous n'êtes pas un navigateur");
+                    }
+                    default -> throw new IllegalStateException("Unexpected value: " + a);
                 }
-                default -> throw new IllegalStateException("Unexpected value: " + a);
+            } else {
+                throw new IllegalArgumentException("Vous n'avez plus d'action.");
             }
-        } else {
-            System.out.println("Vous n'avez plus d'action.");
+        } catch (IllegalArgumentException e) {
+            return false;
         }
+        return true;
     }
 
     public PlayerCollection getPlayerCollection() {
