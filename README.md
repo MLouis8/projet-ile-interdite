@@ -6,6 +6,8 @@ Nous avons tout d'abord réalisé des esquisses du diagramme de classe final et 
 
 Le package models est celui où vivent les "données" utilisées par Views et Controlers. Views va s'occuper de l'affichage du jeu et prendre en paramètres des fonctions (callbacks) à appliquer dans diverses situations. La logique du code réside principalement dans "controlers".
 
+Pour pouvoir facilement gérer le projet nous avons utilisé gradle qui permet de créer un build facilement reproduisible.
+
 ## Jeu
 
 ### Interface
