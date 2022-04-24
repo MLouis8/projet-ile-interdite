@@ -21,7 +21,7 @@ public class MapGrid extends JPanel {
                 JButton button = new JButton(new ImageIcon(cell.getIcon()));
 
                 button.addActionListener((e) -> {
-                    if (game.activate(coord, playerTurn.getAction(), playerTurn.getPlayer(), playerTurn.getTargetedPlayer())) {
+                    if (game.activate(coord, playerTurn.getAction(), playerTurn.getPlayer(), playerTurn.getTargetedPlayer(), playerTurn.getTargetedArtefact())) {
                         playerTurn.refresh();
                         updateButtons(this, game.getGrid());
                     }
@@ -34,7 +34,7 @@ public class MapGrid extends JPanel {
         }
     }
 
-    private void updateButtons(MapGrid mapGrid, CellState[][] cells) {
+    public void updateButtons(MapGrid mapGrid, CellState[][] cells) {
         Component[] components = mapGrid.getComponents();
 
         for (int i = 0; i < components.length; i++) {

@@ -29,7 +29,7 @@ public abstract class Player {
         inventory.put(PlayerAction.SAND_BAG, 0);
         alive = true;
         this.onDeath = new ArrayList<>();
-        this.artefactsKeys = new boolean[]{false, false, false, false};
+        this.artefactsKeys = new boolean[]{false, false, false, false, false};
     }
 
     public List<Consumer<Player>> getOnDeathEvents() {
@@ -184,7 +184,7 @@ public abstract class Player {
                 throw new IllegalStateException("Vous ne pouvez pas recupere l'artefact de " + a + " vous n'avez pas la bonne cle.");
             }
         } else {
-            throw new IllegalStateException("Dommage la cle n'est pas la");
+            throw new IllegalStateException("L'artefact n'est pas la...");
         }
     }
 
@@ -205,10 +205,10 @@ public abstract class Player {
             if (r < 1. / 3) {
                 System.out.println("Oh non la case est s'inonde !");
                 cell.flood();
-            } else if (r < 3. / 6) {
+            } else if (r < 2. / 3) {
                 this.inventory.replace(PlayerAction.SAND_BAG, 1 + this.inventory.get(PlayerAction.SAND_BAG));
                 System.out.println("Tu as tout de meme trouve un sac de sable !");
-            } else if (r < 4. / 6) {
+            } else {
                 this.inventory.replace(PlayerAction.HELICOPTER, 1 + this.inventory.get(PlayerAction.HELICOPTER));
                 System.out.println("Tu as tout de meme trouve un helicoptere !");
             }
@@ -222,9 +222,11 @@ public abstract class Player {
         if (this.hasKey(a)) {
             this.removeKey(a);
             other.gainKey(a);
+            System.out.println("Bien joue vous avez donne votre clef de " + a);
         } else if (other.hasKey(a)) {
             other.removeKey(a);
             this.gainKey(a);
+            System.out.println("Bien joue vous avez pris la clef de " + a);
         } else {
             throw new IllegalStateException("Erreur la cle n'est possede par aucun des deux joueurs");
         }

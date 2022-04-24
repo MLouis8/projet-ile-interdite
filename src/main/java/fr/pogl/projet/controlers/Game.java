@@ -3,12 +3,14 @@ package fr.pogl.projet.controlers;
 import fr.pogl.projet.models.gridManager.CellState;
 import fr.pogl.projet.models.gridManager.Artefacts;
 import fr.pogl.projet.models.gridManager.Coordinates;
-import fr.pogl.projet.models.gridManager.WaterLevel;
 import fr.pogl.projet.models.players.Player;
 import fr.pogl.projet.models.players.PlayerAction;
 import fr.pogl.projet.models.players.PlayerType;
 import fr.pogl.projet.view.Display;
 
+import java.util.Random;
+
+import static java.lang.Math.abs;
 import static java.lang.Math.random;
 
 public class Game {
@@ -17,7 +19,6 @@ public class Game {
     private Coordinates heliport;
     private CellState[][] grid;
     private int nbKeys;
-    private Coordinates[] crucialCells;
     private Display display;
 
     public void start() {
@@ -48,7 +49,6 @@ public class Game {
     public void initializeGrid() {
         CellState[][] newGrid = new CellState[9][9];
         Coordinates[] a = randomCoords(4 + nbKeys * 4);
-
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
                 newGrid[i][j] = new CellState(playerCollection.get().size());
@@ -58,8 +58,6 @@ public class Game {
         for (int i = 0; i < this.playerCollection.get().size(); i++) {
             newGrid[0][4].addPlayer(this.playerCollection.get().get(i));
         }
-
-        this.crucialCells = a;
 
         newGrid[a[0].getX()][a[0].getY()].setArtefacts(Artefacts.EARTH, Artefacts.NULL);
         newGrid[a[1].getX()][a[1].getY()].setArtefacts(Artefacts.FIRE, Artefacts.NULL);
@@ -87,13 +85,23 @@ public class Game {
 
     public Coordinates[] randomCoords(int nbCoords) {
         Coordinates[] coords = new Coordinates[nbCoords];
-        coords[0] = new Coordinates((int) (random() * 9), (int) (random() * 9));
+        Random rd = new Random();
+        coords[0] = new Coordinates(abs(rd.nextInt() % 9), abs(rd.nextInt() % 9));
+        while (coords[0].absDiff(this.heliport) == 0)
+            coords[0].set(new Coordinates(abs(rd.nextInt() % 9), abs(rd.nextInt() % 9)));
 
-        for (int i = 0; i < nbCoords; i++) {
-            Coordinates cell = new Coordinates((int) (random() * 9), (int) (random() * 9));
-            for (int j = 0; j < i; j++) {
-                while ((coords[j].absDiff(cell) == 0) || (coords[j].absDiff(this.heliport) == 0))
-                    cell.set(new Coordinates((int) (random() * 9), (int) (random() * 9)));
+        for (int i = 1; i < nbCoords; i++) {
+            Coordinates cell = new Coordinates(abs(rd.nextInt() % 9), abs(rd.nextInt() % 9));
+            boolean alreadyThere = true;
+            while(cell.absDiff(this.heliport) == 0 || alreadyThere) {
+                cell.set(new Coordinates(abs(rd.nextInt() % 9), abs(rd.nextInt() % 9)));
+                alreadyThere = false;
+                for (int j = 0; j < i; j++) {
+                    if (coords[j].absDiff(cell) == 0) {
+                        alreadyThere = true;
+                        break;
+                    }
+                }
             }
             coords[i] = cell;
         }
@@ -111,7 +119,7 @@ public class Game {
     public void checkEnd(Player p) {
         if (p.getCoordinates().absDiff(this.heliport) == 0)
             if (isWon())
-                stop("Well done! You've won!");
+                stop("You've won!");
 
         if (blockedMovement(p)) {
             p.kill();
@@ -144,8 +152,7 @@ public class Game {
         }
         if (blockedLeft && blockedBottom && blockedRight && blockedTop)
             return true;
-        else
-            return false;
+        return false;
     }
 
     public void stop(String msg) {
@@ -162,9 +169,13 @@ public class Game {
         return artefactCounter == 4;
     }
 
-    public boolean activate(Coordinates c, PlayerAction a, Player p1, Player p2) {
+    public boolean activate(Coordinates c, PlayerAction a, Player p1, Player p2, Artefacts artefact) {
         try {
-            if (p1.getActionsLeft() > 0) {
+            if (p1.getActionsLeft() < 0) {
+                throw new IllegalArgumentException("Vous n'avez plus d'action.");
+            } else {
+                if (p1.getActionsLeft() == 0 && (a == PlayerAction.MOVE || a == PlayerAction.DRY_OUT || a == PlayerAction.PICK_ARTEFACT || a == PlayerAction.EXCHANGE_KEY || a == PlayerAction.NAV))
+                    throw new IllegalArgumentException("Vous n'avez plus d'action.");
                 switch (a) {
                     case MOVE -> p1.moveTo(c, grid);
                     case DRY_OUT -> {
@@ -175,7 +186,7 @@ public class Game {
                     case SEARCH_KEY -> p1.searchKey(grid);
                     case SAND_BAG -> p1.sandBag(c, grid);
                     case HELICOPTER -> p1.helicopter(c, grid);
-                    case EXCHANGE_KEY -> p1.exchangeKey(p2, Artefacts.NULL);
+                    case EXCHANGE_KEY -> p1.exchangeKey(p2, artefact);
                     case NAV -> {
                         if (p1.getType() == PlayerType.NAVIGATOR)
                             p1.moveOther(p2, c, grid);
@@ -184,8 +195,6 @@ public class Game {
                     }
                     default -> throw new IllegalStateException("Unexpected value: " + a);
                 }
-            } else {
-                throw new IllegalArgumentException("Vous n'avez plus d'action.");
             }
         } catch (IllegalArgumentException e) {
             return false;
