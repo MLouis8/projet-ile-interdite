@@ -1,5 +1,6 @@
 package fr.pogl.projet.models.gridManager;
 
+import fr.pogl.projet.Core;
 import fr.pogl.projet.models.players.Player;
 import fr.pogl.projet.models.players.PlayerType;
 import org.jetbrains.annotations.NotNull;
@@ -11,11 +12,12 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class CellState {
 
     private WaterLevel waterLevel;
-    private Player[] players;
+    private final Player[] players;
     private int numberPlayers;
     private Artefacts artefact;
     private Artefacts key;
@@ -28,29 +30,43 @@ public class CellState {
         key = Artefacts.NULL;
     }
 
-    public void setHeliport() { waterLevel = WaterLevel.NULL; }
+    public void setHeliport() {
+        waterLevel = WaterLevel.NULL;
+    }
 
-    public boolean hasKey() { return key != Artefacts.NULL; }
+    public boolean hasKey() {
+        return key != Artefacts.NULL;
+    }
 
-    public boolean hasArtefact() { return artefact != Artefacts.NULL; }
+    public boolean hasArtefact() {
+        return artefact != Artefacts.NULL;
+    }
 
-    public Artefacts getArtefact() { return artefact; }
+    public Artefacts getArtefact() {
+        return artefact;
+    }
 
-    public Artefacts getKey() { return key; }
+    public Artefacts getKey() {
+        return key;
+    }
 
     public void setArtefacts(Artefacts a, Artefacts k) {
         artefact = a;
         key = k;
     }
 
-    public boolean isFlooded() { return waterLevel == WaterLevel.SUBMERGED; }
+    public boolean isFlooded() {
+        return waterLevel == WaterLevel.SUBMERGED;
+    }
 
     public void removeArtefacts() {
         artefact = Artefacts.NULL;
         key = Artefacts.NULL;
     }
 
-    public WaterLevel getWaterLevel() { return waterLevel; }
+    public WaterLevel getWaterLevel() {
+        return waterLevel;
+    }
 
     public void setWaterLevel(WaterLevel waterLevel) {
         this.waterLevel = waterLevel;
@@ -65,8 +81,8 @@ public class CellState {
         for (int i = 0; i < numberPlayers; i++) {
             if (p.getType() == players[i].getType()) {
                 players[i] = null;
-                for (int j = i+1; j < numberPlayers; j++) {
-                    players[j-1] = players[j];
+                for (int j = i + 1; j < numberPlayers; j++) {
+                    players[j - 1] = players[j];
                 }
                 numberPlayers--;
                 return;
@@ -82,26 +98,22 @@ public class CellState {
     }
 
     private BufferedImage playerIcon(@NotNull PlayerType t) throws IOException {
-        BufferedImage img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/explorator.png"));
+        String name;
         switch (t) {
-            case DIVER ->
-                img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/diver.png"));
-            case ENGINEER ->
-                img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/engineer.png"));
-            case NAVIGATOR ->
-                img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/navigator.png"));
-            case MESSENGER ->
-                img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/postman.png"));
-            case PILOT ->
-                img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/pilot.png"));
+            case DIVER -> name = "diver.png";
+            case ENGINEER -> name = "engineer.png";
+            case NAVIGATOR -> name = "navigator.png";
+            case MESSENGER -> name = "postman.png";
+            case PILOT -> name = "pilot.png";
+            default -> name = "explorator.png";
         }
-        return img;
+        return loadImageFromSource(name);
     }
 
     private ArrayList<BufferedImage> createIconArray() {
         ArrayList<BufferedImage> images = new ArrayList<>();
         int i = 0;
-        while(i < numberPlayers) {
+        while (i < numberPlayers) {
             try {
                 images.add(playerIcon(this.players[i].getType()));
             } catch (IOException e) {
@@ -113,23 +125,30 @@ public class CellState {
         return images;
     }
 
+    private BufferedImage loadImageFromSource(String name) throws IOException {
+        return ImageIO.read(Objects.requireNonNull(Core.class.getResourceAsStream("../../../img/" + name)));
+    }
+
     private BufferedImage getBgImage() throws IOException {
-        BufferedImage img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/heliport.jpg"));
-        if (this.hasArtefact()) {
+
+        String name;
+        if (this.hasArtefact())
             switch (getArtefact()) {
-                case FIRE -> img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/fire.jpg"));
-                case WATER -> img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/waterArtefact.jpg"));
-                case WIND -> img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/wind.jpg"));
-                case EARTH -> img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/earth.jpg"));
+                case FIRE -> name = "fire.jpg";
+                case WATER -> name = "waterArtefact.jpg";
+                case WIND -> name = "wind.jpg";
+                case EARTH -> name = "earth.jpg";
+                default -> throw new IllegalArgumentException("Artefact not found");
             }
-        } else {
+        else {
             switch (this.waterLevel) {
-                case FLOOD -> img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/sand&water.jpg"));
-                case DRY -> img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/sand.jpg"));
-                case SUBMERGED -> img = ImageIO.read(new File("/home/mlouis/Bureau/Univ/S4/pogl/projet-ile-interdite/img/water.jpg"));
+                case FLOOD -> name = "sand&water.jpg";
+                case DRY -> name = "sand.jpg";
+                case SUBMERGED -> name = "water.jpg";
+                default -> name = "heliport.jpg";
             }
         }
-        return img;
+        return loadImageFromSource(name);
     }
 
     public BufferedImage getIcon() {
@@ -138,7 +157,7 @@ public class CellState {
         ArrayList<BufferedImage> images = createIconArray();
 
         int nbImages = images.size();
-        double angle = 2*Math.PI / nbImages;
+        double angle = 2 * Math.PI / nbImages;
         double a = 0;
 
         try {
