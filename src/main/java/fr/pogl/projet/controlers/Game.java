@@ -111,4 +111,8 @@ public class Game {
             }
         }
     }
+
+    public PlayerCollection getPlayerCollection() {
+        return playerCollection;
+    }
 }

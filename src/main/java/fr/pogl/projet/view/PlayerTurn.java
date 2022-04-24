@@ -6,6 +6,10 @@ import fr.pogl.projet.models.players.PlayerAction;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PlayerTurn extends JPanel {
 
@@ -30,13 +34,34 @@ public class PlayerTurn extends JPanel {
         add(modeLabel, SwingConstants.CENTER);
         add(numberOfPlayers);
         add(buttons);
-        add(new MapGrid(this, this.game));
+
+        JPanel panel = new JPanel();
+        panel.add(new MapGrid(this, this.game));
+        JPanel rightPanel = new JPanel();
+        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+        game.getPlayerCollection().get().forEach(player -> {
+            JButton playerButton = new JButton(player.getName());
+            ActionListener listener = e -> System.out.println("player button clicked");
+            playerButton.addActionListener(listener);
+            player.getOnDeathEvents().add((p) -> {
+                        playerButton.setBackground(Color.gray);
+                        playerButton.removeActionListener(listener);
+                    }
+            );
+            rightPanel.add(playerButton);
+        });
+        panel.add(rightPanel);
+        add(panel);
         refresh();
     }
 
-    public PlayerAction getAction() { return action; }
+    public PlayerAction getAction() {
+        return action;
+    }
 
-    public Player getPlayer() { return player; }
+    public Player getPlayer() {
+        return player;
+    }
 
     public void refresh() {
         playerNameLabel.setText("player: " + player.getName());

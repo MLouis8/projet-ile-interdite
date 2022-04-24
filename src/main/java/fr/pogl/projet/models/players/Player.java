@@ -8,10 +8,8 @@ import fr.pogl.projet.models.SpecialActions;
 import fr.pogl.projet.models.gridManager.WaterLevel;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.*;
+import java.util.function.Consumer;
 
 public abstract class Player {
 
@@ -22,6 +20,7 @@ public abstract class Player {
     private int artefacts;
     private HashMap<SpecialActions, Integer> inventory;
     private boolean alive;
+    private List<Consumer<Player>> onDeath;
 
     public Player(String name) {
         this.name = name;
@@ -31,9 +30,21 @@ public abstract class Player {
         inventory.put(SpecialActions.HELICOPTER, 0);
         inventory.put(SpecialActions.SAND_BAG, 0);
         alive = true;
+        this.onDeath = new ArrayList<>();
     }
 
-    public boolean isAlive() { return alive; }
+    public List<Consumer<Player>> getOnDeathEvents() {
+        return onDeath;
+    }
+
+    public void kill() {
+        onDeath.forEach((Consumer<Player> a) -> a.accept(this));
+        this.alive = false;
+    }
+
+    public boolean isAlive() {
+        return alive;
+    }
 
     public Collection<PlayerAction> getAvailableActions() {
         return new ArrayList<>(Arrays.asList(PlayerAction.values()));
@@ -45,29 +56,49 @@ public abstract class Player {
         return name;
     }
 
-    public int getArtefacts() { return  this.artefacts; }
+    public int getArtefacts() {
+        return this.artefacts;
+    }
 
-    public int getActionsLeft() { return this.actionCounter; }
+    public int getActionsLeft() {
+        return this.actionCounter;
+    }
 
-    public Coordinates getCoordinates() { return coordinates; }
+    public Coordinates getCoordinates() {
+        return coordinates;
+    }
 
-    public void resetCounter() { this.actionCounter = 3; }
+    public void resetCounter() {
+        this.actionCounter = 3;
+    }
 
-    public void decreaseCounter() { this.actionCounter--; }
+    public void decreaseCounter() {
+        this.actionCounter--;
+    }
 
-    public void increaseCounter() { this.actionCounter++; }
+    public void increaseCounter() {
+        this.actionCounter++;
+    }
 
     public boolean hasKey(Artefacts artefact) {
         return this.artefactsKeys[artefact.ordinal()];
     }
 
-    public void gainKey(Artefacts a) { this.artefactsKeys[a.ordinal()] = true; }
+    public void gainKey(Artefacts a) {
+        this.artefactsKeys[a.ordinal()] = true;
+    }
 
-    public void removeKey(Artefacts a) { this.artefactsKeys[a.ordinal()] = false; }
+    public void removeKey(Artefacts a) {
+        this.artefactsKeys[a.ordinal()] = false;
+    }
 
-    public boolean hasSandBag() { return this.inventory.get(SpecialActions.SAND_BAG) > 0; }
+    public boolean hasSandBag() {
+        return this.inventory.get(SpecialActions.SAND_BAG) > 0;
+    }
 
-    public boolean hasHelicopter() { return this.inventory.get(SpecialActions.HELICOPTER) > 0; }
+    public boolean hasHelicopter() {
+        return this.inventory.get(SpecialActions.HELICOPTER) > 0;
+    }
 
     public boolean isInRange(@NotNull Coordinates coord) {
         if (this.coordinates.absDiff(coord) > 1) {
